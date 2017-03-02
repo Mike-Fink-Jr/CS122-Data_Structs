@@ -1,0 +1,181 @@
+<html>
+<STYLE type="text/css">
+OL.withalpha { list-style-type: lower-alpha }
+</STYLE>
+<center>
+<h3>CMPSC 122<br>
+Fall 2014</h3>
+
+<h3>Homework II<br>
+19 September 2014</h3>
+</center>
+
+This assignment introduces the definition of classes, and their
+use in the implementation and use of a simple linked list.
+Since the list itself consists of a variety of tokens, those
+have also been defined as a class that addresses that variety.
+<p>
+<h4>PROBLEM DESCRIPTION</h4>
+<p>
+The first assignment was a simple program to evaluate expressions like this one:
+<pre><font size=+1>
+	9 - 6 * ( 2 + 8 / 4 ) - 1 + 3 * 7 % 5`
+</font></pre>
+Many people when faced with expressions like this have become
+accustomed to using calculators to make such computations.
+And, of course, calculators are very much like very small computers,
+so how the calculator would solve the problem would be very much
+like the first assignment.
+<p>
+But there are some limitations with the first program that
+should be lifted if our program is to really be a good simulation.
+The limitations to remove in this second assignment are these:
+<ul>
+<li>
+Values appearing in an expression are not limited to single-digit numbers.
+To only allow a user to type one digit at a time would make many
+computations extremely cumbersome.
+<p>
+<li>
+Not only do calculators perform a single computation, but
+they facilitate a series of computations, remembering the results
+of a previous calculation to be used in the next.  This removes
+the need for the user to have to re-enter the calculated result.
+<p>
+For example, this series of inputs:
+<pre>
+	2 + 3
+	- 1
+	* (17 - 13)
+</pre>
+would yield results of 5, 4, and 16.
+</ul>
+<p>
+NOTE to those who did Extra Credit in Homework 1:  The second result above is not negative 1!
+<p>
+<h4>ABSTRACT DATA TYPE -- TOKEN</h4>
+<p>
+The first assignment got away with representing every token in the
+expression as a single character, where that character was either
+a numeric digit or an operator.  That quickly proves to be impractical
+when many integers consist of more than one digit, as do several
+real operators.
+<p>
+Therefore, a good program must be able to support tokens of more
+than one character.  One obvious treatment would be to make every
+token be a character string (or array), but since arithmetic is
+defined for integers and not character arrays, that also can prove
+to be cumbersome.
+<p>
+Instead, we will use objects to represent more abstract data types --
+in this case, a Token can be any element in an expression, (such
+as integer or operator).  If the Token is an integer, its value will
+be easily accessible; and if it is an operator, that too will be
+easily identified.
+<p>
+A Token class has been defined for this assignment to support 
+this flexibility.   It will be expanded upon on later assignments.
+<p>
+<h4>ABSTRACT DATA TYPE -- TOKEN LIST</h4>
+<p>
+Since this application considers an expression to be a series of tokens,
+the idea of a list is certainly appropriate.  There is a definite
+order to the tokens (left to right), and it simply examines them
+as they appear.
+<p>
+The first assignment got by with treating the expression as
+a character array, since all tokens were single characters,
+with some number of unused single-character blanks interspersed.
+But now that tokens may have multiple characters, the character
+array is no longer appropriate.  An array of tokens would be
+conceivable, but without further details on the input, there is
+no real information on how big that array should be.
+<p>
+A dynamically allocated linked list, on the other hand, can
+use just as much memory as is required, so can adequately
+handle inputs of any reasonable length.  It is also simple
+to prepend a token onto the front of this linked list to 
+handle the second bullet point in the Problem Description above.
+<p>
+<font size=-2>
+(One could conceivably prepend the character array input
+with the integer value of a preceding expression, but to do
+so in constant (O(<em>1</em>)) time would require some special application-specific
+handling.  You can try to figure out how that would work, but
+that would not be suitable for this assignment.)
+</font>
+<p>
+This program will basically consist of two phases for each input:
+first the input will be converted into a linked list of Tokens,
+which will represent the <em>complete</em> expression (which may
+require the result of the preceding computation); and then
+evaluate the expression using that linked list.
+<p>
+<h4>COMPONENT FILES</h4>
+Header files (.h) will now begin to declare classes and their methods,
+and source files (.cpp) will implement many of those methods.
+<p>
+There may be some methods within the header file if they
+are very brief.  These are primarily simple accessor methods
+(such as betting the integer value of a Token), but I sometimes
+will expand them to functions that are very very short.
+<p>
+A function that is implemented within a class definition in C++
+becomes an <tt>in-line</tt> function, meaning that when the compiler
+encounters a function call, it simply expands the function code
+in place.  This does yield code duplication in the executable file
+(so should not be done for large functions) -- but it avoids the
+need to call and return, which would dominate the execution time
+of a simple accessor method.
+<p>
+<table border>
+<tr><td><tt>token.h</tt><td>Declares tokens<br>DO NOT CHANGE (yet)
+<tr><td><tt>token.cpp</tt><td>Understands tokens<br>DO NOT CHANGE (yet)
+<br>
+Unless supporting the Extra Credit option
+<tr><td><tt>tokenlist.h</tt><td>Declares token list s<br>
+Complete methods <tt>start, advance, atEnd, nextToken</tt> and submit.
+<tr><td><tt>tokenlist.cpp</tt><td>Implements token list<br>
+Implement the Tokenlist constructor and methods 
+<tt>push_front</tt> and <tt>push_back</tt> and submit.
+<tr><td><tt>evaluate.h</tt><td>Declares <tt>evaluate</tt> function<br>DO NOT CHANGE
+<tr><td><tt>evaluate.cpp</tt><td>Evaluates a tokenized expression</tt><br>
+The algorithm will be essentially unchanged, but now it will
+obtain Tokens from a linked list instead of characters from an array.
+This will still consist of mutually recursive functions using the
+linked list (which must be constructed before any evaluation occurs).
+<br>Complete and submit
+<tr><td><tt>driver.cpp</tt><td>Some code to test the expression evaluation<br>
+Feel free to edit as desired, but do not submit.<br>
+A very different version of this file will be used for grading.
+</table>
+<p>
+The files to be submitted for this assignment are <tt>tokenlist.h,
+tokenlist.cpp</tt> and
+<tt>evaluate.cpp</tt>.
+<p>
+A <tt>makefile</tt> is also provided so that the make utility
+can be used to compile this program.  The first tutorial class 
+will have presented the make utility, and how it relates to
+Visual Studio projects.
+<p>
+<h4>EXTRA CREDIT OPTION</h4>
+Large numbers with very many digits can sometimes be very hard to read,
+so we generally group the digits into groups of three.  Write some
+<em>simple</em> code into the <tt>Token</tt> object.
+to display large integer results in this manner --
+specifically for numbers of greater than FIVE (5) digits.
+<p>
+For example, the value <tt>40320</tt> would show up just the way it is,
+but <tt>3628800</tt> would appear as 3,628,800
+<p>
+You may test this code by having your <tt>driver.cpp</tt>
+construct a Token with any integer (including one returned 
+from <tt>evaluate</tt>).  This function is to be activated
+via the <tt>&lt;&lt;</tt> operator, and not called directly.
+Your <tt>driver.cpp</tt> would need to <tt>#include "token.h"</tt>
+to know what a Token is to do so.
+<p>
+Part of the evaluation for this option will be the simplicity and
+clarity of the code.  Multiple nested loops or huge decision structures
+would therefore not score well, even if they happened to succeed.

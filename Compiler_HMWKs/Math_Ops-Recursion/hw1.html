@@ -1,0 +1,112 @@
+<html>
+<STYLE type="text/css">
+OL.withalpha { list-style-type: lower-alpha }
+</STYLE>
+<center>
+<h3>CMPSC 122<br>
+Fall 2014</h3>
+
+<h3>Homework I<br>
+5 September 2014</h3>
+</center>
+
+This assignment exercises the programming skills developed in CMPSC 121.
+One small portion will be manipulating an array of characters;
+the larger portion will require mutually recursive functions.
+<p>
+Some of the interfaces are defined in this assignment already
+(and must be followed); others will need to be designed and implemented.
+<p>
+<h4>PROBLEM DESCRIPTION</h4>
+<p>
+Most people would have a similar interpretation of the following expression:
+<pre><font size=+1>
+	9 - 6 * ( 2 + 8 / 4 ) - 1 + 3 * 7 % 5
+</font></pre>
+The parentheses enforce an explicit order of operations (the contents
+must be evaluated before its value can be used).  The other operators
+are also assumed to have a precedence:  the multiplication and division
+operators occur before addition and subtraction, and operators in
+the same category are evaluated from left to right.
+<p>
+The purpose of this assignment is to develop a program that
+will evaluate expressions such as this, with the same results.
+Later in the semester, this course will introduce various data
+structures to help this problem, but for now, recursive functions
+will be applied, since each function call has its own memory
+to record what it needs to know.
+<p>
+<h4>COMPONENT FILES</h4>
+Header Files (.h) provide declarations to be used by other parts
+of a large project.  Generally these header files also have
+Source files (.cpp) that provide the implementation for
+functions whose prototypes appear in the header file.
+<p>
+After this assignment, header files will also declare classes,
+to allow for calling the methods within those classes.  This
+assignment, however, simply includes function declarations.
+<p>
+This assignment divides the problem into two distinct parts --
+a scanning part (<tt>tokenize</tt>) to understand the character
+text of the expression and break it up into individual values
+and operators (i.e. tokens); and an evaluation part that will
+understand how all the tokens combine to compute a value.
+<p>
+Later assignments will improve upon one part or the other;
+the division is begun here to avoid having to divide later.
+<p>
+<table border>
+<tr><td><tt>tokenize.h</tt><td>Declares tokenizing functions<br>DO NOT CHANGE
+<tr><td><tt>tokenize.cpp</tt><td>Understands tokens<br>Complete and submit
+<tr><td><tt>evaluate.h</tt><td>Declares <tt>evaluate</tt> function<br>DO NOT CHANGE
+<tr><td><tt>evaluate.cpp</tt><td>Evaluates a tokenized expression</tt><br>
+Most of the work will be within this file, and
+<br>
+will requires a set of mutually recursive functions.
+<br>Complete and submit
+<tr><td><tt>driver.cpp</tt><td>Some code to test the expression evaluation<br>
+Feel free to edit as desired, but do not submit.<br>
+A very different version of this file will be used for grading.
+</table>
+<p>
+The files to be submitted for this assignment are <tt>tokenize.cpp</tt> and
+<tt>evaluate.cpp</tt>.
+<p>
+A <tt>makefile</tt> is also provided so that the make utility
+can be used to compile this program.  The first tutorial class 
+will have presented the make utility, and how it relates to
+Visual Studio projects.
+<p>
+<h4>ALGORITHM HINT</h4>
+The comments currently in <tt>evaluate.cpp</tt> describe a sum expression
+as the sum or difference of one or more product expressions. 
+All of the following qualify:
+<pre>
+	2 * 3		// one product expression
+	2 * 3 + 4 * 5	// two product expressions
+	2 + 3 - 4 + 5	// four product expressions (just no *)
+</pre>
+A similar definition is given for product expressions, involving
+one or more operands to multiply or divide.
+<p>
+A function parsing a sum expression can certainly assume
+there is at least one product expression (and use a function
+to understand that).  Then it just looks to see what comes next --
+whether there is a + or - operator.  If there is, then accept
+the second product expression, and then check for another + or -.
+<p>
+The possibility of parentheses is what leads to recursion in this
+problem -- one may be multiplying the results of sums.
+Parentheses maybe be nested arbitrarily deeply, but should
+not be so deep as to exhaust the stack memory for function recursion.
+<p>
+<h4>EXTRA CREDIT OPTION</h4>
+The subtraction operator is often also used as a prefix operator
+negating the value that immediately follows it.  Any expression
+could begin with that symbol, including a parenthesized expression.
+For example, the expression <tt>- (-6)</tt> would evaluate to 6.
+<p>
+Allow such expressions in your program.  You may assume that
+these extra minus signs may only begin in the beginning.
+The string <tt>5 * -3</tt> would not be a legal expression,
+but <tt>5 * (-3)</tt> would be acceptable.

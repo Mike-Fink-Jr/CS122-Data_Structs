@@ -1,0 +1,139 @@
+<h3>The Double-Linked Lists</h3>
+This is very similar to the Single-Linked List
+presented in the previous class:
+<pre>
+        +---+---+---+  +---+---+---+  +---+---+---+  +---+---+---+
+    X <---- | 5 | ---><--- | 7 | ---><--- | 3 | ---><--- | 4 | ----> X
+        +---+---+---+  +---+---+---+  +---+---+---+  +---+---+---+
+</pre>
+<p>
+Twice as many pointers in existence certainly means 
+all the basic operations have twice as many pointers to update.
+<p>
+This integer linked list example is memory wasteful (67% overhead);
+more data per list node would certainly be more memory efficient.
+<p>
+Benefits include:<br>
+can traverse the list in either order <br>
+it is actually easier to modify the list (e.g. remove a node)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(as will be seen in this week's tutorial)<br>
+facilitates ordering the list in non-chronological order<br>
+&nbsp;&nbsp;&nbsp;&nbsp;e.g. a queue with multiple priority values
+<pre>
+
+
+
+
+
+
+
+
+</pre>
+<h3>The Circular List</h3>
+The previous diagram contained two NULL pointers:<br>
+The tail Node has no successor; the head Node has no predecessor.
+<p>
+An operation that traverses the list would have to check for those
+NULL pointers before following the pointer (else get a run-time error)
+<p>
+Instead, have the head Node follow the tail Node, 
+and the Node precede the head Node.
+<br>
+No more NULL pointers in this picture!
+<p>
+But now need some other way to know when to stop repeating loop
+(such as when you find yourself back where you you started)
+<p>
+One can start a loop anywhere in the list and still visit all elements
+<p>
+There is no special treatment for inserting or removing at the extreme ends of the list.
+<p>
+This data structure could help a program that simulate
+common card games like Hearts, Old Maid, Uno
+<p>
+There are only two special cases to be aware of:
+<br>
+--- adding an element to an empty list<br>
+--- removing the only element of a one-element list
+<pre>
+
+
+
+
+
+</pre>
+<h3>The Augmented Circular List</h3>
+The instructor likes to eliminate these last two special cases
+by defining an empty list to be a single Node with no content.
+If a list does contain data, this special Node completes a circular list
+by following the tail Node and preceding the head Node.
+<p>
+There is a memory price to pay (a completely empty Node, in addition to all the pointers), but in return: no NULL pointers and no special cases!
+<pre>
+class Node
+{
+    friend class AugList;
+    private:
+	int	value;		// value stored here
+	Node   *next;		// what follows
+	Node   *prev;		// what precedes
+	Node( int v, Node *n, Node *p ) : value(v), next(n), prev(p) { }
+};
+
+class AugList
+{
+    private:
+	Node *stub;		// the unused node
+	int   size;
+    public:
+	Auglist()		// create an empty list
+	{
+	    stub = new Node(0, NULL, NULL);
+	    stub->next = stub->prev = stub;
+	    size = 0;		// no data yet
+	}
+    	~Auglist()
+	{
+	    while (stub->next != stub)
+		remove(stub->next);
+	    delete stub;
+	}
+	
+	//  The following really should be four lines eadh instead of one
+	//  with each brace ona line of its own.  They are simply condensed
+	//  for purposes of the lecture slides.	
+	bool    getSize();	{ return size;		     }
+	bool	empty()		{ return size == 0;	     }
+	int	first();	{ return stub->next->value;  }
+	int	last();		{ return stub->prev->value;  }
+	void	RemoveFirst();	{ stub->next->remove();	     }
+	void    AddToEnd(int v) { stub->insertBefore( v );   }
+	void    AddToFront(int v) { stub->next->insertBefore( v );   }
+};
+
+AugList::remove( Node *removal )
+{
+    removal->next->prev = removal->prev;	// connect the neighbors
+    removal->prev->next = removal->next;
+    size--;					// one less value
+    delete removal;				// deallocate node
+}
+
+AugList::insertBefore( int v )
+{
+    Node *newNode = new Node( v, this, prev );	// followed by current node
+    prev->next = newNode;			// follows old predecessor
+    prev = newNode;				// and precedes this one
+    size++;					// one more value
+}
+
+//  and just one illustrative list traversal
+AugList::printReverse()
+{
+    for (Node *curr = prev; curr != stub; curr = curr->prev )
+	cout << curr->value << " ";
+    cout << endl;
+}
+
+</pre>
+A loop that started at a specified node would stop on that same node.

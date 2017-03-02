@@ -1,0 +1,125 @@
+<html>
+<STYLE type="text/css">
+OL.withalpha { list-style-type: lower-alpha }
+</STYLE>
+<center>
+<h3>CMPSC 122<br>
+Fall 2014</h3>
+
+<h3>Homework VI<br>
+14 November 2014</h3>
+</center>
+
+Building off the previous assignment, this defines additional
+derived classes to expand the expressions accepted by
+the program.  In addition, it introduces the use of
+the existing Standard Template Library to assist design.
+<p>
+<h4>PROBLEM DESCRIPTION</h4>
+<p>
+The previous assignment was able to support a wide variety
+of integer expressions, including all the defined operations
+for arithmetic and also the conditional expression for making
+decisions.
+No expression grammar would really be complete without being
+able to call functions.  
+<p>
+To define a function using the actual syntax of the C language
+would require a significant extension to the grammar,
+including semicolons, braces, and variable declarations.
+So instead, this assignment will take a shortcut and define
+functions in this way:
+<pre>
+	deffn sqr(x) = x*x
+	deffn abs(x) = x > 0 ? x : -x
+	deffn gcf(a,b) = (rem = a%b) == 0 ? b : gcf(b,rem)
+</pre>
+The first token in the declaration will always be the string 'deffn'
+(which will look like an token for an undeclared variable),
+followed by a function declaration, and '=', and an expression.
+You may assume the entire definition will appear on one input line.
+Of course, the input may also include all the expressions from
+the previous assignments.
+<p>
+You may assume for this assignment that all functions will be
+defined before any expressions try to use them, and that
+there will be no calls to non-existent functions.
+<p>
+<h4>FUNCTION DEFINITIONS</h4>
+<p>
+There are actually two aspects to handling functions --
+there is the definition of the function and its code,
+which would appear only once in a program.  And then
+there are the function calls, which may occur many times,
+with different actual parameters.
+<p>
+For uniformity, part of the definition part has already been declared
+in a newly provided file.  It would record the function name,
+the name of its formal parameters and all local variables,
+and a link to the code body for that function.
+<p>
+Of course, since a program can consist of multiple functions,
+there would need to be a container to hold these definitions.
+For this assignment, we will take the easy way out and let
+the Standard Template Library take care of this for us.
+And since we always choose a function by name (and not by
+the order in which it was declared), the <tt>map</tt> template
+would be best to use.
+<p>
+A header has been provided to declare this object.   The STL
+will take care of its implementation.  All that is
+required is for your program to use it.  It will create this
+definition map whenever a line begins with "deffn", and then it
+will refer to it whenever a function is called.
+<p>
+A typical compiler might use a single data structure to hold
+all declarations (variables, functions, constants, etc.) but
+we will minimize our work by keeping variables and functions
+separate.  In fact, this will actually simpifly many things,
+since function names in C++ are inherently global, and
+variable names are ideally local.  (And for these programs,
+all variables will be local).
+<p>
+You will therefore see that there is an additional parameter
+defined for evaluating expressions -- a reference to all the
+functions available for use.  Most operations (such as +)
+really do not need this function list, but they will need to
+pass it to anything that does.   You will need to actually
+implement all parts of the code that will deal with
+recognizing a function call, representing it as a tree node,
+and then evaluating it later.
+<p>
+<h4>COMPONENT FILES</h4>
+<p>
+<table border>
+<tr><td colspan=2>New to this assignment:
+<tr><td><tt>funmap.h</tt><td>Defines a data structure for function definitions.
+<br>DO NOT CHANGE
+<tr><td colspan=2>Replaced for this assignment:
+<tr><td><tt>evaluate.h</tt><td>Defines additional parameter to <tt>evaluate</tt>
+<tr><td><tt>driver.cpp</tt><td>Defines and calls a few sample functions
+<tr><td colspan=2>To modify and adapt from earlier assignments:
+<tr><td><tt>token.h</tt><td>May or may not support a comma separating parameters
+<tr><td><tt>token.cpp</tt><td>May or may not support a comma
+<tr><td><tt>tokenlist.h</tt><td>May or may not recognize a comma
+<tr><td><tt>tokenlist.cpp</tt><td>May or may not recognize a comma
+<tr><td><tt>exprtree.h</tt><td>Add support for function call
+<tr><td><tt>exprtree.cpp</tt><td>Add support for function definition and call
+<tr><td><tt>evaluate.cpp</tt><td>Add support for function definition and call
+</table>
+Once again, the grader will not be using the same <tt>driver.cpp</tt> file,
+so you are free to edit that as much as desired to test your code.
+<p>
+Most of the files above will be included with your submission,
+with the exception of <tt>evaluate.h</tt> and <tt>driver.cpp</tt>.
+Any input that was valid for Homework II will still be valid now.
+<p>
+A <tt>makefile</tt> is also provided so that the make utility
+can be used to compile this program.  The first tutorial class 
+will have presented the make utility, and how it relates to
+Visual Studio projects.
+<p>
+<h4>NO EXTRA CREDIT OPTION</h4>
+<p>
+The final assignment will have several extensions for Extra Credit,
+so if you want to or need to get credit, take an early look at that!

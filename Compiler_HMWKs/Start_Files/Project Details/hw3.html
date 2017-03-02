@@ -1,0 +1,185 @@
+<html>
+<STYLE type="text/css">
+OL.withalpha { list-style-type: lower-alpha }
+</STYLE>
+<center>
+<h3>CMPSC 122<br>
+Fall 2014</h3>
+
+<h3>Homework III<br>
+3 October 2014</h3>
+</center>
+
+This assignment continues with the use of a simple linked list,
+including an iterator to traverse that list. It also includes
+the implementation and use of a stack.
+<p>
+<h4>PROBLEM DESCRIPTION</h4>
+<p>
+What people find to be a natural way of writing an arithmetic expression
+is not so natural to a machine implementation.  Even for something as
+simple as <tt>2 + 2</tt>, we recognize that the addition operator applies
+to the value that follows it.  In scanning the expression from left to right,
+we implicitly remember the plus, until we know what it would be adding.
+<p>
+In a computer program, we certainly have a natural way of remembering
+a value, those are stored in memory.  But remembering an operation
+(which may involve several machine instructions) is not so natural.
+With that in mind, some machine designers would prefer to have the
+operands precede the operation, such as <tt>2 2 +</tt>.  Once the
+plus symbol is seen, the values to add have already been encountered.
+<p>
+Consider this expression (simplified from the earlier assignments):
+<pre><font size=+1>
+	9 - 6 * ( 2 + 8 / 4 ) 
+</font></pre>
+Rewriting this with the operators last, and with parentheses
+included for clarity, this would become
+<pre><font size=+1>
+	9 ( 6 ( 2 ( 8 4 / ) + ) * ) -
+</font></pre>
+Now the subtracting is clearly postponed until its operands
+have been determined.
+<p>
+Usually, expressions like this are written without parentheses.
+Every operator applies to the values that immediately precede it,
+where those values are either given, or computed by other operators:
+<pre><font size=+1>
+	9 6 2 8 4 / + * -
+</font></pre>
+Postfix expressions therefore have no need for parentheses, which
+simplifies their grammar, as well as the machine implementation.
+It is actually used by Hewlett Packard calculators, and also by
+the Java Virtual Machine (a hidden simulation within a Java implementation).
+<p>
+Unfortunately, it is unlikely that most of the population at large
+will adopt postfix notation for general use, so most programs will
+still accept the more well-known infix form.
+<p>
+This assignment consists of two major steps:
+<ul>
+<li> Convert an infix expression into a postfix expression.
+<br>
+Both expressions will be represented as a linked list of Tokens,
+as were defined in the previous homework.
+<li> Evaluate a postfix expression that computes an integer value.
+</ul>
+<p>
+Between these two steps, display the contents of both linked lists.
+<p>
+NOTE: Just as the preceding assignment, this solution must
+permit the possibility of using the result of a previous calculation.
+<p>
+<h4>ALGORITHM HINTS</h4>
+Both of the major steps above could be understood recursively,
+but they also both have well-known iterative algorithms.
+One iterative algorithm will be required for this assignment;
+the other will be optional.
+<p>
+Required Loop Implementation:<br>
+Each operator in a postfix expression applies to operands that precede it.   
+A recursive implementation to evaluate a postfix expression 
+would have found those operands recursively.
+An iterative approach would instead expect to find its two
+values stored in a data structure, and then stores its results
+in that same data structure.   It will always be retrieving
+the most operands that have been determined, so one needs a
+data structure that supports that.   All it needs to do is scan
+a postfix expression and perform operations as it sees them.
+<p>
+Optional Loop Implementation:<br>
+It should be evident that in translating an expression from infix to postfix,
+the order of the operands is preserved (such as the values 9, 6, 2, 8, 4).
+The operators are postponed until later, with lower precedence
+operations (accounting for parentheses) occurring after higher
+precedence operations.  A stack would be an excellent place to
+store these operators until the proper time.
+<p>
+When two operators of equal precedence have been encountered
+(accounting for parentheses), the first one encountered is no
+longer postpone -- it is supposed to occur before the second.
+It would be removed from the stack to the output, and then
+replaced by the new arrival.
+<p>
+Regarding the Optionality:<br>
+If this were the last or only assignment involving arithmetic expressions,
+this loop implementation would likely not be optional -- it is
+a very standard method that is worth knowing.  But for the later
+assignments, the recursive parsing method would actually be much
+simpler, so it would save a lot of student programming time to
+keep the same algorithm here as was used since the first assignment.
+<p>
+<h4>INTRODUCTION TO ITERATORS</h4>
+<p>
+Practicing good information hiding means that a client using
+a container (such as a linked list) should have no knowledge
+of the exact implementation (such as next pointers).  Of course,
+it is good for it to know enough about the container to know that
+it is appropriate to the application, but isolating the implementation
+greatly reduces the chances of programming errors.
+<p>
+The <tt>TokenList</tt> class in the previous assignment included
+some methods to assist in traversing the linked list, so that
+the application could visit the list elements in turn.  Unfortunately,
+building that into the list class itself introduces a possibly
+burdensome limitation -- only one traversal may be performed at a time.
+<p>
+Therefore it is preferable to have a distinct variable outside
+of the <tt>TokenList</tt> class to support traversal, so that
+several traversals could be performed concurrently.  The only
+new 'free' code for this assignment defines a new class that
+would allow sequential access to the <tt>TokenList</tt> object.
+Since it actually follows the next pointers within the class,
+it will need to be given access by being declared as a friend.
+So, inside the <tt>TokenList</tt> object itself, include a declaration:
+<tt>friend class ListIterator;</tt>
+<p>
+<h4>COMPONENT FILES</h4>
+<p>
+<table border>
+<tr><td><tt>token.h</tt><td>Declares tokens<br>May define operator precedence
+<tr><td><tt>token.cpp</tt><td>Understands tokens<br>May define operator precedence
+<tr><td><tt>tokenlist.h</tt><td>Declares token list s<br>
+Add support for the ListIterator.  An amendment has been provided.
+<tr><td><tt>tokenlist.cpp</tt><td>Implements token list<br>
+The only required changes should be an appendix provided to support iterators.
+<tr><td><tt>evaluate.h</tt><td>Declares <tt>evaluate</tt> function<br>DO NOT CHANGE
+<tr><td><tt>evaluate.cpp</tt><td>Evaluates a tokenized expression</tt><br>
+Must now convert an infix expression to postfix, and evaluate the postfix form.
+Do display both lists immediately after translation and before evaluation.
+<br>Complete and submit
+<tr><td><tt>driver.cpp</tt><td>Some code to test the expression evaluation<br>
+Feel free to edit as desired, but do not submit.<br>
+A very different version of this file will be used for grading.
+</table>
+<p>
+The files to be submitted for this assignment are <tt>tokenlist.h,
+tokenlist.cpp</tt> and
+<tt>evaluate.cpp</tt>.
+If you defined and used precedence for tokens, include
+<tt>token.h</tt> and/or <tt>token.cpp</tt> as well.
+<p>
+A <tt>makefile</tt> is also provided so that the make utility
+can be used to compile this program.  The first tutorial class 
+will have presented the make utility, and how it relates to
+Visual Studio projects.
+<p>
+<h4>EXTRA CREDIT OPTION</h4>
+<p>
+Consider the following expression:
+<pre>
+    4 * ( - ( - 4 - 3 ) )
+</pre>
+An 'easy' way to address the negation operator is to imagine
+it is subtracting from 0, yielding this postfix expression:
+<pre>
+    4 0 0 4 - 3 - - *
+</pre>
+<p>
+Implement a clean and simple solution to this negation operator
+that does not require pushing extra zeros onto the stack.
+Be sure to mention that you have done so in the Message Box
+when submitting, so the grader will know to test your code.
+<p>
+Since the specifications above require displaying both linked lists,
+the grader should be see how you went about addressing this problem.

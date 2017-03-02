@@ -1,0 +1,299 @@
+<h3>Intro to Linked Lists</h3>
+<p>
+Consider an application that acts as a server handling
+multiple service requests and processing them in turn.
+<p>
+It is possible that several requests can arrive at the same time,
+and would need to be stored until they can be processed.
+<p>
+Occasionally a high priority quest should be processed soon,
+(but no sooner than existing high-priority requests).
+<p>
+Suppose we use an array with these invariants:
+<pre>
+N outstanding requests occupy positions 0 through N-1 in the array.
+<br>
+The next request to be processed is array element[0]
+</pre>
+<table border>
+<tr><td>Add a new request to the end<td>O(<em>1</em>)
+<tr><td>Remove the first request for processing<td>O(<em>n</em>)
+<tr><td>Insert a high priority request<td>O(<em>n</em>)
+</table>
+<p>
+As the number of unprocessed requests increases, so does the amount
+of time maintaining this data structure.  Less time is spent actually
+servicing the requests themselves, so the work piles up.
+<p>
+There is a better alternative using an array (we will see later),
+but there is still another outstanding question:
+<p>
+What is the size of the array?   (If too small, information is lost.)
+<pre>
+
+
+
+
+</pre>
+<h3>A closely related example</h3>
+Everyone has stood in line at some point, usually expecting`
+to receive service in order of arrival.
+<p>
+It is easy to know that you are first, second, or third in line,
+but for long lines, it usually impossible to guess 'your subscript'.
+Also, it is impossible to know how 'your subscript' changes
+as time goes by.
+<p>
+Yet, there is no confusion about how a line operates, because
+the subscript is unimportant; maintaining an array subscript is not productive.
+<p>
+It is sufficient to know where the line begins, where it ends,
+and who is followed by whom.   A program data structure can do the next
+with the help of pointers.
+<p>
+Here is an example of a linked list of integers:
+<pre>
+    +---+---+   +---+---+   +---+---+   +---+---+
+    | 5 | ----> | 7 | ----> | 3 | ----> | 4 | ----> X
+    +---+---+   +---+---+   +---+---+   +---+---+
+      ^                                   ^
+      +---- head                 tail ----+
+</pre>
+Each of these boxes indicates a variable that can be allocated
+and deallocated individually of all others.  How would this behave?
+<p>
+<table border>
+<tr><td>Add a new request to the end<td>O(<em>1</em>)
+<tr><td>Remove the first request for processing<td>O(<em>1</em>)
+<tr><td>Insert a high priority request<td>O(<em>1</em>)*
+</table>
+* assumes a small constant upper-limit on number of outstanding high-priority requests
+<p>
+<pre>
+
+
+
+
+
+</pre>
+<h3>A rough draft of the implementation</h3>
+Each element in a linked list is a separate object, allocated
+and deallocated independently of other objects.  Each contains
+a pointer to its successor in addition to its data.
+So, for an integer linked list:
+<pre>
+class Node 
+{
+    int	    value;		// value stored here
+    Node   *next;		// pointer to successor
+};
+
+class List
+{
+    Node   *head,		// pointer to the first element
+	   *tail;		// pointer to the last element
+}
+
+//  to add a new Node to the end of an existing list:
+    tail->next = newNode;	// last element now has a successor
+    tail = newNode;		// and that has become the last element
+
+//  to remove the Node from the beginning of an existing list:
+    head = head->next;		// the second item is now first
+
+</pre>
+The sample code is clearly O(<em>1</em>), not at all depending on the length of the list.
+<pre>
+
+
+
+
+</pre>
+<h3>Memory Allocation and Deallocation</h3>
+The lifetime of a value in the linked list is independent
+of the function call behavior of a program, so must be managed
+directly by the programmer.
+<p>
+It easy to identify when a Node should be allocated or deallocated:
+<br>
+at the time it is added or removed from the list.
+<p>
+These two list operations should be in charge of the allocation
+and deallocation of Nodes, so that the client application
+does not need to worry about pointer management.
+<p>
+When deleting a Node from a list, it is best to assure the
+list has been placed in a stable state before deallocating the Node,
+else you may be residing on data in deallocated memory!
+<p>
+To delete a complete linked list when it is no longer needed:
+<br>
+-- a loop traverses each node and deletes it<br>
+-- a recursive function is called for each node and deletes it<br>
+-- a destructor recursively deletes a successor Node<br>
+&nbsp;&nbsp;&nbsp; be careful if you really only want to remove one thing!
+<pre>
+
+
+
+
+</pre>
+<h3>Data Privacy and Information Hiding</h3>
+A client should be able to:<br>
+--- create a new (empty or initialized) linked list<br>
+--- add values to a linked list<br>
+--- remove values from a linked list<br>
+--- examine a value stored in a linked list (such as the first)<br>
+--- perhaps know how many values are in the linked list<br>
+--- perhaps see all of the contents of the list, in order
+<p>
+A client must not be able to:<br>
+--- make unrestricted changes to the data currently in the list<br>
+--- change the pointers in the list<br>
+--- reassign where the list begins or ends
+<p>
+Therefore, all data members for Node and List should be private,
+and only the interface (constructors and methods) public.
+<p>
+But doing that introduces a little snag:
+<br>
+If all <tt>next</tt> pointers in a Node are private, how can a List update them?
+<p>
+A class may declare other classes or functions to be a <tt>friend</tt>,
+granting the rights to manipulate its data to a select few.
+<pre>
+
+
+
+
+</pre>
+<h3>Putting that much more together</h3>
+<pre>
+class Node 
+{
+    friend class List;		// a List is permitted to access these
+    private:
+	int     value;		// value stored here
+	Node   *next;		// pointer to successor
+	Node( int v, Node *n ) : value(v), next(n) { }
+};
+
+class List
+{
+    private:
+	Node   *head,		// pointer to the first element
+	       *tail;		// pointer to the last element
+	int     size;		// number of elements
+    public:
+	List(int v)		// create a list with one element
+	{
+	    head = tail = new Node(v, NULL);
+	    size = 1;		// one value so far
+	}
+        int getSize()		// may ask what the size is
+	{
+	    return size;
+	}
+	int firstValue()	// may ask what is at front
+	{
+	    return head->value;
+	}
+}
+
+List::insertAtEnd( int value )
+{
+    Node *newNode = new Node( value, NULL );
+    tail->next = newNode;	// last element now has a successor
+    tail = newNode;		// and that has become the last element
+    size++;			// one more item in the list
+}
+
+List::removeFromFront( )
+{
+    Note *removal = head;	// remember what is being removed
+    head = head->next;		// the second item is now first
+    delete removal;
+}
+
+List::~list()			// destructor method to deallocate list
+{
+    while (head != NULL)
+	removeFromFront();	// might as well use existing code
+}
+
+
+
+
+
+</pre>
+<h3>Placement of Method Implementations</h3>
+In the previous example, some methods were implemented
+within the class definition and some were not.
+<p>
+This primarily affects how the compiler treats function calls to methods.
+<p>
+If the method implementation is within the class, the compiler
+can see it, and expand the function in place in the code
+(assigning to variables, and substituting references).
+<p>
+This saves the instruction time to copy parameters, call the function,
+return from the function, and copy return values.
+<p>
+If the implementation is not within the class, that <em>inline</em>
+expansion is not possible.  The only option is to call and return (as normal)
+<p>
+The apparent time savings comes at the cost of expanding the
+code whenever it is called.  Large functions or frequently called
+functions may actually incur a time penalty when the extra machine
+code piles up.
+<p>
+So this inline expansion is best limited to very very short methods
+<br>
+( most constructors and destructors, and accessor methods )
+<br>
+that are highly unlikely to be changed or re-engineered.
+<p>
+Recursive functions cannot be inline.
+<pre>
+
+
+
+
+</pre>
+<h3>Some other List Considerations</h3>
+If a client only needs access to the front or back of a list,
+a linked list implementation is O(<em>1</em>).
+<p>
+But access any other part of the array requires following pointers (O(<em>n</em>)).
+<p>
+<table>
+<tr><td><td>Linked List<td>Sorted Array
+<tr><td>Accessing the k'th element<td>O(<em>n</em>)<td>O(<em>1</em>)
+<tr><td>Searching for a particular value<td>O(<em>n</em>)<td>O(<em>log n</em>)
+<tr><td>Find maximum or minimum<td>O(<em>n</em>)<td>O(<em>1</em>)
+</table>
+But if you consider the original applications (server requests or a line),
+these sorts of operations would not be required.
+<p>
+<hr>
+<p>
+Regarding memory use:<br>
+There is no need to 'guess' how much memory is required (vs. the array)
+<p>
+But we do allocate more memory than we use for the data; pointers occupy space.
+<p>
+Only 50% of the integer linked list actually contains the integer data.
+<p>
+Practically, linked list nodes contain a lot more information.<br>
+e.g. my class roster as a list with names, grades, emails, etc.
+<br>
+with only one 'next' pointer per student would be very memory efficient.
+<p>
+<hr>
+<p>
+Also Note: all linked lists have very similar behaviors,<br>
+so code reuse suggests we should only have to implement the concept once.
+<p>
+C++ provides templates (which will be postponed until November);
+<br>
+C also has a useful mechanism (which will be postponed until December)

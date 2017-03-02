@@ -1,0 +1,223 @@
+<html>
+<STYLE type="text/css">
+OL.withalpha { list-style-type: lower-alpha }
+</STYLE>
+<center>
+<h3>CMPSC 122<br>
+Fall 2014</h3>
+
+<h3>Homework V<br>
+31 October 2014</h3>
+</center>
+
+This assignment will also use a tree structure, but
+in this case, there will be several different varieties
+of elements in that tree.  It will therefore also make
+use of derived classes and polymorphism.
+<p>
+<h4>PROBLEM DESCRIPTION</h4>
+<p>
+An <em>expression tree</em> is a representation of an expression
+that highlights how operands and operands relate to each other
+with respect to order of operations.  For example, here is an
+expression tree for the expression displayed in Homework I:
+<pre>
+   9 - 6 * ( 2 + 8 / 4 ) - 1 + 3 * 7 % 5
+
+                      +
+                   /     \
+                  -       %
+                 / \     / \
+                -   1   *   5
+               / \     / \
+              9   *   3   7
+                 / \ 
+                6   +   
+                   / \
+                  2   /
+                     / \
+                    8   4
+</pre>
+A person seeing this as a picture can possibly more easily determine
+which operations must precede which others.   Similarly, a compiler
+can more easily understand an optimize this code if it has an internal
+representation like this.
+<p>
+As an example of a possible optimization, consider the leftmost
+portion of this expression.  Until this point, all methods of
+evaluating the expression would need to hold the first values
+(9, 6, 2, 8, 4) simultaneously in memory, using five memory locations
+to do so.  On the other hand, a compiler could postpone placing
+the 9 into memory it is done computing with the other four values.
+In fact, we could even imagine taking advantage of commutativity
+by 'rewriting' the tree to represent <tt>(8/4 + 2) * 6</tt>.
+This would reduce the need to hold values that are not yet used
+in a computation.
+<p>
+Such an optimization will not be part of this assignment
+(Homework VII will revisit it).  For now, it will be enough
+to build this tree and evaluate it.
+<p>
+This program is to accept every legal input from the earlier assignments,
+including the use of variables.  In addition, it is to support the
+Conditional Expression, which appears in C, C++, and Java.
+<p>
+<h4>CONDITIONAL EXPRESSIONS</h4>
+<p>
+This is an example expression that uses a conditional expression:
+<pre>
+	y = x > 0 ? x : -x
+</pre>
+A boolean (true/false) expression precedes the <tt><b>?</b></tt> symbol,
+and a <tt><b>:</b></tt> separates expressions that would be evaluated
+in case that boolean was true or false, respectively.   One could
+rewrite this one using an <tt>if</tt> statement like this:
+<pre>
+	if (x > 0)
+	    y = x;
+	else
+	    y = -x;
+</pre>
+The conditional expression can be used in several contexts where
+the <tt>if</tt> statement cannot, such as the middle of other
+expressions, or as arguments to functions, etc.  It also allows
+our expression programs to evaluate many more interesting things.
+<p>
+The conditional expression unfortunately cannot be well represented
+in a postfix grammar.  At first glance, it would seem straightforward
+to have a postfix expression first evaluate the consequences
+(e.g. <tt>x</tt> and <tt>-x</tt>) and then choose one afterwards,
+but that would not always give correct results.  In fact, in Homework VI,
+we will even see a common context for which such an approach would
+be completely wrong.
+<p>
+Instead, this will also be represented in tree form, with a
+boolean expression to evaluate, and then the appropriate subtree
+would be evaluated after the boolean expression.
+<p>
+<h4>BOOLEAN VALUES IN OUR INTEGER EXPRESSIONS</h4>
+<p>
+For simplicity, all values in these homework assignments will
+be assumed to be integers.  We will borrow the approach the C
+language family, and just use integer values to stand for booleans.
+0 will stand for false; any nonzero (usually 1) will stand for true.
+You may either explicitly use 1 for true, or simply use
+whatever value the underlying C++ language gives.
+<p>
+Support these six operators for making boolean tests:
+<pre>
+	>  <  >=  <=  == !=
+</pre>
+The <tt>&amp;&amp;</tt>, ||, </tt> and <tt>!</tt> will not be required,
+since they would add more work that is useful for this assignment.
+<p>
+<h4>POLYLMORPHIC EXPRESSION TREE</h4>
+<p>
+Any legal expression can be an operand to an addition operation;
+any legal expression can have its value compared to another;
+any legal expression's value can be assigned to a variable.
+So to have the program's data structure dictate the nature
+of the operands would be highly inflexible or cumbersome.
+<p>
+Therefore, this is a situation where class inheritance is
+especially helpful.  A generalized tree node will be part
+of the expression tree, but then will be specialized for
+each of the possible things that may be an expression:
+<ul>
+<li> a constant integer value
+<li> a variable
+<li> a computation (arithmetic or relational or assignment)
+<li> a conditional expression
+</ul>
+The assignment operation can be treated as a separate case, if desired.
+<p>
+This program will build an expression tree using these
+derived classes, and then evaluate afterwards.  Parsing
+the input can use recursive functions very much like
+those in Homework II.  
+<p>
+<h4>THE toString METHOD IN THIS ASSIGNMENT</h4>
+<p>
+It would always be nice to be able to use the <tt>&lt;&lt;</tt> operator
+to display newly defined objects, even when there are derived classes.
+Unfortunately, we cannot simply define friend operator functions for
+each derived class, because the compiler would be producing code to call
+functions at compile time.
+<p>
+It is possible to make the compiler postpone method binding
+until run time if we use <tt>virtual</tt> methods -- where a
+parent class indicates that the function call choice will be postponed.
+However, we cannot do the same thing for functions that are not
+declared within an object.
+<p>
+So instead, a <tt>toString</tt> method has been defined for these
+objects, and then the friend operator function for output will
+call that method.  Defining <tt>toString</tt> as virtual then lets
+each derived class dictate how its output will appear.  This much
+has already been partially provided for you.
+<p>
+Within the implementation for converting integer values to strings,
+you will see an object type <tt>ostringstream</tt>, which is
+treating a string as if it were receiving the output (instead
+of a file or the screen).  This technique will be very useful
+for those derived classes that are not yet implemented.
+<p>
+<h4>COMPONENT FILES</h4>
+<p>
+<table border>
+<tr><td colspan=2>New to this assignment:
+<tr><td><tt>exprtree.h</tt><td>Defines the classes for the expression tree.
+<br>DO NOT CHANGE, unless doing Extra Credit
+<tr><td><tt>exprtree.cpp</tt><td>Implements the class, with help from recursion.
+<br>Two derived classes are provided; two are not.
+<br>Complete and submit
+<tr><td colspan=2>To modify and adapt from earlier assignments:
+<tr><td><tt>token.h</tt><td>May or may not need changes to support new operators.
+<tr><td><tt>token.cpp</tt><td>May or may not support new operators.
+<tr><td><tt>tokenlist.h</tt><td>May or may not recognize new operators.
+<tr><td><tt>tokenlist.cpp</tt><td>May or may not recognize new operators.
+<tr><td><tt>evaluate.cpp</tt><td>
+Will now convert a string into an expression tree and evaluate the tree.
+<br>Complete and submit.
+</table>
+Once again, the grader will not be using the same <tt>driver.cpp</tt> file,
+so you are free to edit that as much as desired to test your code.
+<p>
+Most of the files above will be included with your submission,
+with the exception of <tt>evaluate.h</tt> and <tt>driver.cpp</tt>.
+Any input that was valid for Homework II will still be valid now.
+<p>
+A <tt>makefile</tt> is also provided so that the make utility
+can be used to compile this program.  The first tutorial class 
+will have presented the make utility, and how it relates to
+Visual Studio projects.
+<p>
+<h4>EXTRA CREDIT OPTION</h4>
+<p>
+One of the earliest languages in the field of Artificial Intelligence
+was Lisp.  A version of that language is still in use in supporting
+the Emacs editor (which is very much still in use).
+<p>
+A fundamental data structure in Lisp is the list (in fact, its name
+comes from that fact).  In Lisp, all lists are space separated
+items enclosed within parentheses:
+<pre>
+	( 3 4 5 )	( 1 2 (3 4) 5 )
+</pre>
+In fact, the all operations and functions in Lisp are also
+lists, in which the first element is a function or operator:
+<pre>
+	( + 3 4 )	( abs x )
+</pre>
+Write code that will display your expression trees in Lisp form
+immediately before evaluating.  A couple files have been provided
+to help you work with this Extra Credit option:
+<ul>
+<li><tt>trylisp.sh</tt> takes a file of Lisp expressions and evaluates them.
+<li><tt>add1</tt> is a sample file containing some sample Lisp expressions.
+</ul>
+<p>
+It is expected that it will take considerably less time to implement
+this feature into your assignment than to understand the relevant
+portions of the Lisp language, especially if you make full use of
+the inheritance features in the data.

@@ -1,0 +1,336 @@
+<html>
+<STYLE type="text/css">
+OL.withalpha { list-style-type: lower-alpha }
+</STYLE>
+<center>
+<h3>CMPSC 122<br>
+Fall 2014</h3>
+
+<h3>Homework VII<br>
+8 December 2014</h3>
+</center>
+
+This assignment includes another excellent application
+for inheritance, where one parent class has several
+derived classes, at least one of which may have derived
+classes of its own.  Also, it provides another opportunity
+to make use of the Standard Template Library.
+<p>
+<h4>PROBLEM DESCRIPTION</h4>
+<p>
+The previous two assignments provided a very good picture
+how how expressions are structured, and how they can be
+evaluated, but they do not at all represent how a real
+program would tend to evaluate them.   Although a compiler
+may build a tree structure to understand and optimize code,
+it would not try to store that data structure in a file
+to be interpreted at run time.
+<p>
+Instead, it would produce a series of instructions understood
+by the machine -- what is often referred to 'object code'.
+This assignment will mimic that translation into a machine language,
+and then simulate execution of that code.   No knowledge of
+any particular machine language or assembly language will be
+required for this assignment.
+<p>
+<h4>THE SIMULATED MACHINE</h4>
+<p>
+Instructions occupy memory; data occupies memory; so naturally
+our simulated machine will consist of memory.  This will be easily
+represented by arrays.  The instruction memory array will hold
+instructions (a new abstract data type); the data memory array
+will simply be an array of integers, since all of our expressions
+deal with integers only.
+<p>
+In addition, most modern machines have a distinct set of storage
+locations directly within the Central Processing Unit, called "registers".
+All instructions involving calculations will use the registers.
+There are separate instructions that would transfer values
+back and forth between these registers and the data memory.
+<p>
+For simplicity, and since many real compilers do this, we will
+first assume an arbitrarily large number of registers are available,
+and just pick a new one any time one is needed.   Of course, a real
+machine really has a finite set of registers, but that issue is
+handled as a later step, and therefore not important to this assignment.
+<p>
+The instructions in many modern machines are very simple --
+just doing one operation.  It might be easiest to jump to an example.
+<p>
+<h4>SAMPLE CODE TRANSLATION AND EXECUTION</h4>
+Here is a small 'program' to use an example input to the assignment:
+<pre>
+a = 3
+b = a+2
+(b+1)*(b+1)
+</pre>
+And jumping to the end, here are the results of 'running' this code.
+<pre>
+3
+5
+36
+</pre>
+In fact, Homework 5 should have been able to do this already.
+<p>
+But different from Homework 5 is what happens in between: producing
+and executing some sort of machine code.   Here is what my solution produces:
+<pre>
+ 0: T1 = 3
+ 1: stack[0] = T1
+ 2: print T1
+ 3: T2 = stack[0]
+ 4: T3 = 2
+ 5: T4 = (T2+T3)
+ 6: stack[1] = T4
+ 7: print T4
+ 8: T5 = stack[1]
+ 9: T6 = 1
+10: T7 = (T5+T6)
+11: T8 = stack[1]
+12: T9 = 1
+13: T10 = (T8+T9)
+14: T11 = (T7*T10)
+15: print T11
+</pre>
+The exact appearance of your intermediate code is not important,
+and this is not precisely how the instructions are represented in 
+my data.   The code to display my compiled instructions just
+displays them in a format that is easier to read.
+<p>
+This example uses 11 registers (T1 through T11), two variables
+(sorted in positions 0 and 1 on the stack), and 16 instructions.
+Of these instructions, 4 place a constant into a register, 3
+load a variable into it, 2 store into a variable, and 4 compute.
+Those are representative of what real machines do.
+<p>
+Real machines, however, do not actually have a 'print' instruction.
+That is a convenience for this assignment.  It may be noted that
+there is no equivalent in the input file either.  It will be understood
+implicitly that the result of each expression is to be displayed.
+<p>
+Typical machines also have two very important special registers --
+the program counter and the stack pointer.  The program counter
+is nothing more than an indicator of what instruction to do next.
+For the simple example above, all it did was count from 0 to 16.
+The stack pointer assists in finding variables in the data memory,
+and will be discussed more later in this assignment file.
+<p>
+<h4>REPRESENTING INSTRUCTIONS</h4>
+The program is represented as an array of instructions, but
+there several different kinds of instructions available.
+Therefore, inheritance would be highly relevant in this problem.
+<p>
+There are very few methods required for any of these classes.
+All that is needed is a way to construct an instruction,
+a way to display it (much like <tt>toString</tt> for ExprTree),
+and a way to execute it.  Furthermore, execution should be
+very simple, since all the necessary information is encoded
+in the instruction itself.  (I expect many one-line methods).
+<p>
+In addition, it should be noted that all of the computational
+instructions look very similar.  To emphasize that, I just wrote
+one output function that is used by all 4 of those above, by
+defining an intermediate instruction type for all such computations.
+The individual instructions simply define their own ways
+of executing themselves.  An example declaration is provided as well.
+<p>
+<h4>THE NEWLY GIVEN MAIN FUNCTION</h4>
+<p>
+The given Driver program does the following:
+<pre>
+-- accepts the name of a "source code" file from the command line.
+-- reads each source line in turn, and "compiles" it into machine code
+-- displays all of the compiled code (such as those 16 instructions above)
+-- initializes the program counter and stack pointer
+-- runs the program until it gets to the end
+</pre>
+<p>
+The <tt>compile</tt> function is very much the same as the
+<tt>evaluate</tt> function in the previous assignments, renamed
+to emphasize the no actual evaluate occurs.  Instead, the
+the appropriate machine instructions are generated and stored
+into the program memory.
+<p>
+Since it is expected that each derived class already has 
+a straightforward way of performing each operation,
+it should be straightforward to adapt them to generate
+the required machine instructions, and in the proper sequence.
+<p>
+The interface to <tt>compile</tt> also includes some reference
+parameters to be assigned where the program execute will begin and end.
+Certainly in the example, it began at the beginning of the array,
+but if there were any functions defined first, those would not
+execute until they were called.
+<p>
+You will see that this driver program refers to the size
+of the Variable Tree data structure -- that is, how many 
+variables have been defined within it.  It might be more
+obvious to just have it also start at zero, but this was
+done to support function calls (see later). 
+<p>
+The given main program also automatically advances the program counter
+for every instruction (like any machine would).  This avoids
+the need to do it separately for each instruction type.
+<p>
+<h4>OPERATIONS TO SUPPORT</h4>
+<p>
+For full credit on this assignment, your program must
+support all arithmetic operations, variables, and the
+assignment operation to modify those variables.
+The rest of the following will be worth varying amounts 
+of Extra Credit.
+<ul>
+<li>The conditional expression
+<br>
+This would need to be able to jump over the code that is not to
+be executed, which would require instructions to change the program counter.
+Two new instructions would suffice -- one to change the program
+counter if and only if the boolean expression is false; and one
+to change it unconditionally (to get to the next expression).
+In both cases, what to change it to will not be known until a bit later,
+so these instructions will be backpatched when the required value is known.
+<p>
+Of course, this would also require support for the relational operators,
+but that is not much different from arithmetic.
+<p>
+<li>Non-Recursive Function Definitions and Function Calls
+<br>
+This involves assigning values to the parameters, changing the program
+counter to refer to the function, and then, after the function ends,
+changing the program counter back to where it was.  Also, it will
+making sure two active functions do not try to use the same memory.
+<p>
+Everyone should recall that when a 'real' program runs, memory
+is set aside for each function's variables, and then returned
+on function exit.  That can be managed by the given stack pointer
+variable.  This value (which is just an array subscript here)
+is subtracted by the memory needs of the function at the start,
+and then restored by addition at the end.
+<p>
+That this is starting at the back of the memory array and subtracting
+instead of starting and the front and adding is simply a matter of
+practicality.  If we started at 0, then the value to add or subtract
+would be the memory needs of the calling function, which are completely
+unknown to the called function, which could be called from anywhere
+at any time.  This subtraction approach allows us to compile with
+known values.
+<p>
+To be able to return to the calling function at the end, one
+must remember where to go back to.  And if there are further 
+function calls, several such values would need to be remembered.
+Fortunately, we already have this simulated stack memory, so
+it would be wise to make use of it.
+<p>
+A lot of stuff clearly happens on function call and return.
+You are welcome to define special Call and Return instructions
+to do so, even if those instructions have a lot to do (such
+as changing the stack pointer and program counter).
+It might be simple in some cases to actually use the existing
+register to/from memory instructions to assist you.
+<p>
+Full credit for this extra credit option must support
+multiple arguments, and not necessarily exactly one.
+<p>
+<li>Recursive Functions</li>
+To avoid infinite recursion, these functions would necessarily
+use the conditional expression within the function body.
+Ideally that would mean this would follow naturally from
+both of the preceding Extra Credit options.  
+<p>
+But since it is very possible to create an implementation
+that does not support recursion (which was true for many
+20th-century compilers), so this is just making sure
+the two features work together properly.
+</ul>
+<p>
+<h4>COMPONENT FILES</h4>
+<p>   
+<table border>
+<tr><td colspan=2>New to this assignment:
+<tr><td><tt>machine.h</tt><td>Defines the abstract data type for machine instruction
+<br>
+Complete by defining the necessary derived classes.
+<tr><td><tt>machine.cpp</tt><td>Implements the display and execution of instructions.
+<br>
+Complete by implementing the necessary class methods.
+<tr><td><tt>compile.h</tt><td>Defines the top-level interface in the program
+<br>
+This is substituting for evaluate.h, but has much of the same appearance.
+<tr><td><tt>compile.cpp</tt><td>Build an expression tree, and then translate to machine code.
+<br>
+No starter file is given; over half of it is just the previous <tt>evaluate.cpp<tt>
+<tr><td colspan=2>Replaced for this assignment:
+<tr><td><tt>driver.cpp</tt><td>Now gets data from a file, then compiles and executes.
+</table>
+<p>
+Several files will need to have additional code added to them.
+The <tt>exprtree</tt> files will need to include the ability to
+translate the tree into instructions.  The <tt>vartree</tt> and
+<tt>funmap</tt> files will need to note that variables and
+functions occupy positions in memory, and it would be useful
+to know just how much space is required by those variables.
+<p>
+Since no new language elements are added in this phase, there
+should be no changes required to <tt>token</tt> or <tt>tokenlist</tt>
+<p>
+<h4>ADDITIONAL EXTRA CREDIT: COMMON SUBEXPRESSIONS</h4>
+<p>
+A quick glance at the sample code above would indicate that
+it is doing a bit more work than it needs to do.  It is
+computing the value of "b+1" twice.   It seems it should
+only need to compute that value once, and then reuse its value.
+<p>
+A good optimizing compiler would do its best to eliminate
+such redundant work.   Here is a sketch of how it could do that.
+<p>
+First: Every time a variable is assigned to, remember where
+it got its value from.  After all two "b+1"'s would not be equal
+if the value of b could change between them.
+<p>
+In this case, the only assignment to variable b is the value of T4.
+<p>
+Once that is recorded, that fact can be used for all subsequent
+uses of that variable, before it is changed again.  For this
+sample program, we would not be calling for new registers 
+in instructions 8 and 11, but would simply use T4 again.
+<p>
+Similarly, before defining a new register to hold a constant value
+we can check to see if that value has already been encountered.
+That would mean we would not have to store 1 into two of them.
+<p>
+That much would start generating code that looks like this:
+<pre>
+ 0: T1 = 3
+ 1: stack[0] = T1
+ 2: print T1
+ 3: T2 = 2
+ 4: T3 = (T1+T2)
+ 5: stack[1] = T3
+ 6: print T3
+ 7: T4 = 1
+ 8: T5 = T3+T4
+</pre>
+We have now gotten as far as evaluating the first "b+1", and
+now things get interesting.  When translating the second "b+1",
+we see a need for b (already in T3) and a 1 (already in T4).
+So computing "b+1" means adding T3 + T4, but we already did that too!
+The second operand to the multiplication can just reuse T5,
+and we will have eliminated three instructions all at once.
+<p>
+That is the optimization technique in a nutshell, but to be
+truly good, it must be reasonably efficient.  It would not
+be wise to scan through all the preceding instructions to look
+for a match.  Doing so would make compilation time proportional
+to the square of the size of the program!
+<p>
+Instead a good implementation must include a fast (e.g. O(<em>1</em>) time)
+way of identifying that the sum T3+T4 was already computed
+(even if it was not the very last operation).  The same approach
+would also be helpful in spotting duplicated constant values.
+<p>
+NOTE: Do not get misled by the conditional expression.
+If "b+1" was computed when a boolean test was true, it will
+not be available to the code for when the boolean test is false,
+and will not always be available after that expression is complete.
+It would be therefore acceptable (and likely more correct)
+to let some of that code stay the way it is.

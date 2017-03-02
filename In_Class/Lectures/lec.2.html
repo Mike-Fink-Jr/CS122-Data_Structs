@@ -1,0 +1,291 @@
+<h3>Expectations for this Course</h3>
+I expect my incoming students to be good at writing good code.
+<p>
+My goal is to have outgoing student that are good <em>and efficient</em>
+at producing good <em>and efficient</em> code.
+<p>
+A good programmer would be good at:
+<ul>
+<li> choosing appropriate variable types (int, double, bool)
+<li> using basic control structures (if, while, for)
+<br>
+(without anything resembling goto, break, or continue)
+<li> using one-dimensional arrays <em>effectively</em>
+<br>
+(frequent use of constant subscripts is NOT effective)
+<li> design and implement functions effectively
+<li> be able to make <em>assertions</em> about code<br>
+(function pre- and post-conditions; loop invariants)
+</ul>
+<p>
+Code is good if:
+<ul>
+<li> Every function has a clear and well-defined and documented purpose<br>
+(which is unlikely true for functions that span more than two pages)
+<li> Every variable has a clear and well-defined and documented purpose<br>
+(excepting loop variables, which are clear without documentation)
+<li> Every statement has a clear and well-defined purposes<br>
+(which does not include 'work around a bug elsewhere in the code')
+<li> Function interfaces are clear, and do not involve global variables.
+<li> Every inobvious calculation or algorithm is clearly described in comments
+<li> A newcomer of comparable programming skill can read the code <em>casually</em> from top to bottom can understand what it does and how it does it <em>and</em> believe it solves the problem correctly.
+<br>
+(Documented assertions can be very important for that!)
+</ul>
+<pre>
+
+
+
+
+
+
+</pre>
+<h3>Becoming an Efficient Programmer</h3>
+Some of these skills you should already have
+<p>
+Loops, arrays, and functions can all improve efficiency
+<br> by eliminating unnecessary code duplication.
+<p>
+Recursive thinking can be an excellent way to understand a problem
+<br>
+(though not always an excellent way to implement its solution)
+<p>
+One hour of thoughtful design can save two hours of coding and many hours of debug.
+<p>
+A programmer that is fluent in a language should be able to<br>produce at least one line of fully-correct code per minute.
+<p>
+Object-oriented programming often has many tiny functions  (quickly written)
+<p>
+Good data structures will save time both during development and execution.
+<p>
+Using multiple source files in a project can save development time.
+<pre>
+
+
+
+
+
+</pre>
+<h3>Producing Efficient Code</h3>
+<p>
+Efficient code will generally run more quickly than inefficient code.
+<p>
+But first, a couple examples of what is NOT meant by efficient code:
+<table width=80%>
+<tr><td>"Obvious" Code<td>"Optimized" Code
+<tr><td><pre>
+sum = 0;
+for (int i = 0; i < size; i++)
+   sum = sum + a[i];
+  
+sumsq = 0;
+for (int i = 1; i <= n; i++)
+   sumsq = sumsq + i*i;
+</pre>
+<td><pre>
+sum = 0;
+for (int *p = a, int i = size; i--;)
+   sum += *p++;
+  
+odd = -1;
+for ( sumsq = square = 0; n--; )
+    sumsq += square += odd += 2;
+</pre>
+</table>
+The time spent producing and debugging this "optimized" 
+could very easily exceed any reduced execution time,
+especially in a 21st century programming environment.
+<pre>
+
+
+
+
+</pre>
+<h3>Intro to Big-O notation</h3>
+The amount of time a program requires depends on many factors:
+<br>
+amount of input, hardware technology, system load, temperature
+<p>
+As programmers, we can simplify this to the number of instructions
+executed as a function of the number of inputs.
+<br>e.g.  17n&sup2 + 45n + 600</br>
+<p>
+Those constants would be very difficult to estimate, especially
+since it depends on the behavior of if-statements, etc.
+<p>
+Big-O notation summarizes the complexity of a program by considering
+the largest growth factor.  As n increases, n&sup2; increases
+more quickly in value than 45n or 600, so the previous formula would be O(<em>n&sup2</em>)
+<p>
+The mathematical definition of big-O notation says:
+<pre>
+    T(n) is O(<em> g(n) </em>)  === T(n) < cg(n)   for some c for all n > some N
+</pre>
+    17n&sup2 + 45n + 600 < 20n&sup2  for all n > 30
+<p>
+NOTE: This can be a rather loose upper bound: <br>
+<tt>T1(n) = 600</tt> is also O(<em>n&sup2</em>) by this definition, but we might call it O(<em>1</em>)
+<p>
+The mathematical part of this is covered in more depth in CMPSC 360 and 465.
+<pre>
+
+
+
+
+
+</pre>
+<h3>Common growth rates:</h3>
+<table>
+<tr><td>Name<td>Notation</td>Examples
+<tr><td>Constant<td>O(<em>1</em>)<td>Minimum or Median of Sorted Array
+<tr><td>Logarithmic<td>O(<em>log n</em>)<td>Binary Search of Sorted Array
+<tr><td>Linear<td>O(<em>n</em>)<td>Minimum or Search of Unsorted Array
+<tr><td>Log-linear<td>O(<em>n log n</em>)<td>Merge Sort and Quick Sort
+<tr><td>Quadratic<td>O(<em>n&sup2</em>)<td>Selection and Bubble Sorts
+<tr><td>Cubic<td>O(<em>n&sup3</em>)<td>Matrix Multiplication, Linear Equations
+<tr><td>Exponential<td>O(<em>c^n</em>)<td>Recursive Fibonacci
+</table>
+Brute-Force code breaking is expected to be no better than Exponential time.
+<p>
+What 'n' refers to will depend on the context.
+<br>
+-- length of input arriving while program runs
+<br>
+-- amount of data currently stored in a data structure
+<br>
+-- number of digits in an encryption code
+<p>
+<pre>
+
+
+
+
+</pre>
+<h3>Run-time Analysis should be easy</h3>
+Assuming temporarily that "..." contains no repetition (O(<em>1</em>)):
+<table>
+<tr><td>for (int i = 0; i &lt; n; i++) ...<td>O(<em>n</em>)
+<tr><td>for (int i = 17; i &lt; n-1; i++) ...&nbsp;&nbsp;<td>O(<em>n</em>)
+<tr><td>for (int i = 1; i &lt; n*n; i++) ... <td>O(<em>n&sup2</em>)
+<tr><td>while (n > 0) { ...; n = n/2; }<td>O(<em>log n</em>)
+</table>
+<p>
+Nested Loops should also usually be easy, generally
+multiplying the complexity of the inner loop by how often the whole loop repeats.
+<p>
+<table
+<tr><td>If "..." above were <td colspan=3>The first three examples would be
+<tr><td>for (int j = 0; j &lt; n; j++) ...
+<td>O(<em>n&sup2</em>)<td>O(<em>n&sup2</em>)<td>O(<em>n&sup3</em>)
+<tr><td>for (int j = 0; j &lt; n*n; j++) ...&nbsp;&nbsp;
+<td>O(<em>n&sup3</em>)<td>O(<em>n&sup3</em>)<td>O(<em>n^4</em>)
+<tr><td>for (int j = 0; j &lt; i; j++) ...
+<td>O(<em>n&sup2</em>)<td>O(<em>n&sup2</em>)<td><b>O(<em>n^4</em>)
+<tr><td>for (int j = i; j &lt; n; j++) ...
+<td>O(<em>n&sup2</em>)<td>O(<em>n&sup2</em>)<td><b>O(<em>n&sup2</em>)</b>
+</table>
+<p>
+Of course, not all loops are counting loops like these,
+but they should still be easy to describe<br>
+--- for each value in the input -- O(<em>n</em>) with n = #inputs<br>
+--- for each value in the array -- O(<em>n</em>) with n = #array elements
+<p>
+Single-recursive functions behave much like loops, so are also easy to analyze.
+<P>
+Multiple-recursive functions need more analysis -- see CMPSC 360 and 465
+<pre>
+
+
+
+
+
+</pre>
+<h3>Bad Programs may make Analysis Hard</h3>
+Students who focus on memorizing code instead without understanding it
+usually end up with programs that are highly inefficient, even if they work:
+<pre>
+for (int i = 0; i < size-1; i++)        // go through the array
+    if (a[i] > a[i+1])                  // if two elements out of order
+        {
+        swap ( a[i], a[i+1] );          //    place them in order
+        i = 0;                          //    and start again
+        }
+// loop ends when all array elements are in order
+</pre>
+At first glance, the loop body here is O(<em>1</em>), and the loop repeats O(<em>n</em>) times.
+<p>
+But this code does not count in a straightforward fashion; it might count
+<pre>
+    0 1 2 3 4 0 1 2 3 0 1 2 0 1 2 3 4 5 6 0 1 2 3 4 5 0 1 2 3 4 ....
+</pre>
+This is actually an O(<em>n&sup3</em>) implementation!
+<p>
+The first line of this code lies to the programmer and the casual reader.<br>
+Good code very clearly describes its behavior.
+<pre>
+
+
+
+
+
+</pre>
+<h3>Careful Note: Not all program statements are O(<em>1</em>) operations</h3>
+<p>
+<table>
+<tr><td>
+<pre>
+minimum = a[0];
+for (int i=1;  i&lt; size; i++)&nbsp;&nbsp;&nbsp;
+    if (minimum > a[i])
+	minimum = a[i];
+</pre>
+O(<em>n</em>)
+<td valign=top>
+<pre>
+sort(a);
+mininum = a[0];
+</pre>
+<p>
+NOT O(1)
+<br>
+O(<em>n&sup2</em>) or O(<em>n log n</em>)
+</pre>
+</table>
+<p>
+The <tt>pow</tt> function in the standard math library uses <em>repetition</em>
+in its implementation (using Taylor or McLaurin series).  
+<pre>
+
+
+
+
+
+</pre>
+<h3>Be practical!</h3>
+<p>
+Suppose there was a guru that promised to be able to answer any question in one year:
+<table>
+<tr><td>Question asked<td>Execution time</td>
+<tr><td>Please sort these 5 numbers<td>one year
+<tr><td>Please sort these 400 numbers<td>one year
+<tr><td>Please sort these billion numbers&nbsp;&nbsp;<td>one year
+</table
+Conclusion, this is an O(<em>1</em>) algorithm, which clearly has a much better growth rate than quick sort!
+<p>
+<hr>
+If we have quick sort available (and we do in the standard libraries), 
+it is a good function to use.  If not, before implementing it, 
+consider your application:
+<pre>
+-- sorts 100 values; will only be used once<
+-- sorts 100 values; will be used many times
+-- sorts many values; will only be used once
+-- sorts many values; will be used many times
+</pre>
+<p>
+Similarly "fine-tuning" code must consider the programmer time involved
+vs. the total time saved over all executions of the program.  
+<p>
+Usually better to leave the fine tuning to compiler optimizations, 
+which apply to all executions of ALL programs compiled with that compiler.
+

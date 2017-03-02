@@ -1,0 +1,196 @@
+<h3>Abstract Data Types</h3>
+It can often be simpler to think about an application 
+if one does not have to worry about the language details of its implementation.
+<p>
+With good modularity and information hiding, one can manipulate
+an object without knowing anything about how it is truly represented.
+<p>
+Examples from this course and some others I have taught:<br>
+clock time, deck of cards, container (bag or box), automobile
+<p>
+Even the idea of a Container of data is an abstraction --<br>
+it could be an array or a linked list, which have different implementations.
+<p>
+Our first abstract data types for Containers are closely related to lists.
+<pre>
+
+
+
+
+
+</pre>
+<h3>The Stack</h3>
+Analogous to s stack of plates at a buffet restaurant.
+New elements are always placed on top of the stack in O(<em>1</em>) time.
+<br>
+Existing data is always retrieved from the top of the stack in O(<em>1</em>) time.
+<p>
+This is often called a LIFO (Last-In, First-Out) data structure.
+<p>
+This is a simple data structure for storing information temporarily
+and retrieving it later, especially if chronological order is
+not required.
+<p>
+It can be implemented very easily as a single-linked list with only a <tt>head</tt> pointer.
+<p>
+BUT, a Stack is not necessarily a linked list.<br>
+Everyone in this course should have already implemented it with an array.
+<p>
+An array implementation needs no pointers (uses less memory),<br>
+but brings up the question on what the array size should be.
+<p>
+The Standard Template Library for C++ defines a Vector type
+that behaves like an array which can reallocate and grow if data
+is added to the end, so can support an efficient stack.
+<p>
+The <em>system stack</em> used for local function variables also is
+not allocated as a linked-list data structure, but occupies a continuous region of memory.
+<p>
+<pre>
+
+
+
+
+</pre>
+<h3>The Queue</h3>
+This is the word used in Great Britain for when referring to standing in a line.
+<p>
+New data elements are always stored at the back of the line in O(<em>1</em>) time.
+<br>
+Elements are only removed from the front of the line in O(<em>1</em>) time.
+<p>
+This is often called a FIFO (First-In, First-Out) data structure.
+<p>
+This data structure can also be easily implemented as a single-linked list, as is done for the Homework.
+<p>
+The queue can also be implemented as an array, but not using the last week's definition.
+<br>
+(first element == array[0]) ---> (insertion is O(<em>n</em>))
+<p>
+So remove that definition and record head and tail subscripts:
+<pre>
+      +---+---+---+---+---+---+---+---+
+      |   |   | 3 | 4 | 5 | 6 |   |   |
+      +---+---+---+---+---+---+---+---+
+         head --^               ^-- tail
+</pre>
+<p>
+Having the <tt>tail</tt> subscript refer just past the end of the data<br>
+-- makes the insert/remove operations very similar (increment last)<br>
+-- simplifies the computation determining number of elements
+<p>
+Of course, this approach will very rapidly reach the end of the array!
+<pre>
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+<h3>The Circular Array</h3>
+Similar in concept to the circular linked list -- the first element follows the last.
+<pre>
+      +---+---+---+---+---+---+---+---+
+      | 9 |   |   | 4 | 5 | 6 | 7 | 8 |
+      +---+---+---+---+---+---+---+---+
+     tail --^       ^-- head
+</pre>
+All appropriate operations are O(<em>1</em>), and this requires less memory and time than a list.
+<p>
+If this array overflows, it can also be reallocated:
+<pre>
+      +---+---+---+---+---+---+---+---+
+      | 9 |10 |11 | 4 | 5 | 6 | 7 | 8 |
+      +---+---+---+---+---+---+---+---+
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+      |   |   |   | 4 | 5 | 6 | 7 | 8 | 9 |10 |11 |   |   |   |   |   |
+      +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+</pre>
+Copying the data requires O(<em>n</em>) time, but only occurs after at least O(<em>n</em>) insertions (and probably many more)
+<p>
+The long-term cost averages out to O(<em>1</em>), so insert is still considered O(<em>1</em>).
+<pre>
+
+
+
+
+
+
+
+</pre>
+<h3>The Double-Ended Queue</h3>
+This allows insertion and removal at both ends of the data (and nowhere else),
+so includes all the features of both stacks and queues.
+<p>
+Sometimes the name is simply shortened to <tt>deque</tt>.
+<p>
+This also can be implemented using a circular array with all supported operations O(<em>1</em>)
+<p>
+The Standard Template Library has a much more complicated variation:
+<pre>
+
+    +---+
+    | ----> X     +---+---+---+---+---+---+---+---+
+    +---+     /-> |   |   |11 |12 |13 |14 |15 |16 |
+     + ------/    +---+---+---+---+---+---+---+---+
+    +---+         +---+---+---+---+---+---+---+---+
+    + ----------> |17 |18 |19 |20 |21 |22 |23 |24 |
+    +---+         +---+---+---+---+---+---+---+---+
+    + -------\    +---+---+---+---+---+---+---+---+
+    +---+     \-> |25 |26 |27 |   |   |   |   |   |
+    | ----> X     +---+---+---+---+---+---+---+---+
+    +---+
+</pre>
+This represents a circular array of pointers, each pointing at
+a dynamically allocated of a fixed size (8 in this example).
+<p>
+To find the 19th element: 19 &divide 8 = 2 R 3; element #3 of array #2
+<p>
+If the circular array overflows, it can be reallocated, but
+all that needs to be copied are pointers, and not the actual data (much less time)
+<p>
+The Standard Template Library also defines subscripting for this
+Abstract Data Type so that deque[0] == 11, deque[1] = 12, etc.
+<br>
+This subscript operation is also O(<em>1</em>), which would not be true for a list.
+<p>
+Inserting or removing anywhere other than the endpoints is O(<em>n</em>) and messy!
+<pre>
+
+
+
+
+
+
+
+</pre>
+<h3>Wrapping up these Abstract Data Types</h3>
+The stack, queue, and deque can be grouped together under the category
+of <tt>sequences</tt>.
+<p>
+Each has the idea of a <tt>sequential order</tt> -- there is such
+a thing as a first and last, or beginning and end.
+<p>
+The order in which the data appears is important.<br>
+The position where the data appears is unimportant (and changes as time passes)
+<p>
+Key operations are inserting and removing values from the data structure,
+where the choice of removal is based on when it was inserted.
+<p>
+The implementation may use either linked lists or arrays
+<p>
+Arrays do not require space for pointers and may take less time to execute,
+<br>
+but require the ability to accurately predict the array size.
+<p>
+Linked lists can adapt to the memory needs while the program is running,
+<br>
+at the cost of recording and maintaining pointers.
+<p>
+The Homework uses the linked list approach so it can work with any length expression.

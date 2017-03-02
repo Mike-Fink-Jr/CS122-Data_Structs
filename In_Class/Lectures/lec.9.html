@@ -1,0 +1,158 @@
+<h3>Intro to Inheritance</h3>
+Suppose when developing a program, you discover there is an
+existing class type that would be very helpful to you.
+You would like to make use of it to reduce development time.
+<p>
+But sometimes there may be features or interfaces that do
+not exactly match what you wish for your application,
+and you would like to rewrite those methods, but you do
+not have the ability or permission to rewrite the existing
+class.
+<p>
+Inheritance is a mechanism that allows one to build a new
+class out of an existing class, inheriting those features
+one wishes to keep.
+<p>
+So, one will declare a <tt>derived class</tt> from a <tt>base class</tt>
+to share in inherit existing features and also<br>
+-- add new features (e.g. add element counting to a Stack that does not have it)<br>
+-- define a new implementation (e.g. change how TimeOfDay displays current time)<br>
+-- adapt it to a new application (e.g. use AugList to support a Stack or Queue)
+<pre>
+
+
+
+
+
+
+</pre>
+<h3>Extending a base class</h3>
+Suppose <tt>SimpleStack</tt> has this public interface:
+<pre>
+class SimpleStack
+{
+    public:
+	void push(int value);		// push a value onto the stack
+	void pop();			// remove a value from the stack
+	int  top();			// display the top value
+	bool empty();			// is there anything still there?
+};
+</pre>
+This contains all the necessary features of an integer stack,
+but perhaps one wishes to know just how many values are currently stored.
+Finding that out with this stack would require destroying and rebuilding it!
+<p>
+It would be nice to have a value simply count what is available,
+so let us do so:
+<pre>
+class CountingStack : public SimpleStack	// keep all the public features
+{
+    private:
+	int count;			// number of values
+    public:
+	CountingStack() : count(0) { }	// initially zero values
+	void push(int value)
+	{
+	    SimpleStack::push(value);	// use existing code to push
+	    count++;			// one more value
+	}
+	void pop(int value)
+	{
+	    SimpleStack::pop(value);	// use existing code to pop
+	    count--;			// one fewer value
+	}
+	int getCount() const		// and be able to report value
+	{
+	    return count;
+	}
+};
+
+
+
+
+
+
+</pre>
+<h3><tt>protected</tt> members</tt></h3>
+There is no information above regarding how <tt>SimpleStack</tt> actually works.
+<p>
+Even if we could see the source code for its implementation,
+all of the <tt>private</tt> members are unavailable for use,
+even for derived classes.
+<p>
+If the implementation happened to use an array (counting from element 0),
+this new <tt>count</tt> variable would be redundant, but still necessary to support <tt>getCount()</tt>
+<p>
+A class designer can be 'friendly' to other coders by allowing some members of  a class to be visible to derived classes.
+<p>
+For example, the non-public part of <tt>SingleStack</tt> could be:
+<pre>
+	protected:
+	    int data[STACK_SIZE];	// implemented as an array
+	    int firstEmpty;		// first empty spot (where to push)
+</pre>
+So now <tt>getCount()</tt> is simply <tt>return firstEmpty;</tt>
+<p>
+Or, if the designer really wants to avoid the data from being accidentally corrupted:
+<pre>
+	private:
+	    int data[STACK_SIZE];	// implemented as an array
+	    int firstEmpty;		// first empty spot (where to push)
+	protected:
+	    int getFirstEmpty()		// you can look
+	    [
+		return firstEmpty;	// but don't touch
+	    }
+</pre>
+<p>
+In either case, an application declaring a stack cannot access these data members.
+<pre>
+
+
+
+
+
+
+</pre>
+<h3>Restricting or Adapting a ase class</h3>
+Perhaps the existing code not only includes features you wish
+to use for your new application, but also many you do not wish to use.
+<pre>
+class CountingStack : private AugList	// hide the base class
+{
+    public:
+	int getCount();		{ return AugList::getSize();	}
+	int empty();		{ return AugList::empty();	}
+	void push(int value);	{ AugList::AddToFront(value);	}
+	void pop();		{ AugList::RemoveFirst();	}
+	void top();		{ AugList::first();		}
+};
+</pre>
+<p>
+All of these are made inline so that the call can be made directly.
+<p>
+All of these chosen methods here are O(<em>1</em>).
+<pre>
+
+
+
+
+
+
+
+
+</pre>
+<tt>Intro to Polymorphism</tt>
+Suppose every person with a mailing address could be represented by <tt>class Person</tt> with a public method <tt>getMailingAddress()</tt>.
+<p>
+Most of the time, that would simply be the address where you live;<br>for some it might be a Post Office Box number.
+<p>
+Some people use multiple mailing addresses for different purposes, so this method would need to make a decision.
+<p>
+A derived class <tt>Faculty</tt> might direct University-related mail to a campus office, and other mail to a residence.
+<p>
+A derived class <tt>Entrepreneur</tt> might direct business mail to a PO box, and the rest home.
+<p>
+When requesting for someone's mailing address, the operation depends on the invidicual.
+<p>
+

@@ -1,0 +1,270 @@
+<h3>Programming with Classes</h3>
+A <i>class</i> is a <i>data structure</i>, holding multiple values.
+<p>
+An <i>array</i> is also a data structure, holding multiple values.
+<p>
+In an array, all values must be of the same type,
+and are accessed using a subscript (usually an integer)
+<p>
+In a class, values may be of different type,
+and are all accessed by individual names.
+<p>
+Each name specifies an <i>instance variable</i>.
+<p>
+<pre>
+class Complex {
+   double   real, imag;
+};
+Complex  c1, c2;
+</pre>
+<tt>real</tt> and <tt>imag</tt> are instance variables.
+<p>
+<tt>c1</tt> and <tt>c2</tt> are <i>instances</i> of this class.<br>
+(Try thinking of all the variables in the past as instances of integers, etc.)
+<p>
+<tt>c1.real = c2.imag;</tt>
+<pre>
+
+
+
+
+</pre>
+<h3>Initializing an instance of a class</h3>
+It is certainly straightforward to initialize each instance variable:
+<pre>
+c1.real = 3;	c2.real = 4;
+c1.imag = 2;	c2.imag = -1;
+</pre>
+<p>
+But when a class has many instance variables, this may be tedious.
+<p>
+Most classes define <tt>constructors</tt>, which are initialization functions.
+<pre>
+class Complex {
+   double  real, imag;
+   Complex( double r, double i )
+      : real(r), imag(i) { }
+};
+<p> 
+Complex c1(3,2), c2(4,-1);
+</pre>
+<p>
+Note: all instance variables are visible to any function defined
+within that class, but they are not global variables.
+<p>
+Functions defined within a class are called <i>methods</i>.
+<pre>
+
+
+
+
+</pre>
+<h3>More about methods</h3>
+Methods are functions that are defined within a class
+to manipulate the instance variables.
+<p>
+Since there may be more than one instance of any class,<br>
+the name of an instance is also used in calling a method.
+<p>
+<pre>
+Complex Complex::conjugate()
+{
+   imag = -imag;
+   return *this;	// 'this' refers to the current object
+}
+  
+double Complex::magnitude()
+{
+   return sqrt( real*real + imag*imag );
+}
+  
+c2 = c1.conjugate();
+cout << c2.magnitude();
+</pre>
+The syntax with the '::' indicates that these are member functions
+of the class Complex, and would be used if the functions are implemented
+outside the declaration of the class itself.  (More later)
+<pre>
+
+
+
+
+</pre>
+<h3>Accessor Methods</h3>
+Consider the following class definition:
+<pre>
+class TimeOfDay {
+   int hour, minute, second;
+   TimeOfDay( h, m, s ): hour(h), minute(m), second(s) { }
+}  clock;
+</pre>
+These would be a legal statements:<pre>
+clock.minute = 70;
+clock.second = -40;
+</pre>
+These would rather ruin the intuition of what time it is!
+<pre>
+To maintain control over the value of instance variables, many classes
+hide them from the 'outside' world, be declaring them to be <i>private</i>.
+</pre>
+Access to the instance variables is limited to <i>accessor methods</i>:
+<pre>
+class TimeOfDay {
+    private:
+       int  hour, minute, second;   // not accessible directly
+    public:
+       TimeOfDay( h, m, s )   { setTime( h, m, s ); }
+       void setTime( h, m, s) { setHour(h); setMin(m);  setSec(s); }
+       void setMin( m )
+       {
+    	    if (m >= 0 && m < 60)   minute = m;
+       }
+       int getMin()		  { return minute; }
+};
+
+
+
+
+
+</pre>
+<h3>Towards Information Hiding</h3>
+Once a client is disallowed from changing instance variables directly,<br>
+there is no need for that client to know the details of how those<br>
+instance variables are actually implemented.
+<p>
+A class implementer is free to change the implementation of a class<br>
+as much as he likes, if he preserves the interface visible to the outside.
+<p>
+<pre>
+class TimeOfDay {
+private:
+   int secondsSinceMidnight;	// ranges from 0 to 24*60*60-1
+public:
+   int getHour()	{  return secondsSinceMidnight / 60 / 60; }
+   int getMinute()	{  return secondsSinceMidnight / 60 % 60; }
+   int getSecond()	{  return secondsSinceMidnight % 60;      }
+   void setHour(h)
+   {
+	if (h >= 0 && h < 24)
+	   secondsSinceMidnight = h*60*60 + secondsSinceMidnight % (60*60);
+   }
+   void advanceTime( int deltaSeconds )
+   {
+	secondsSinceMidnight += deltaSeconds;
+	secondsSinceMidnight %= (60*60*24);
+   }
+};
+
+
+
+
+</pre>
+<h3>More Towards Information Hiding</h3>
+Of course, the details of an implementation are not very well hidden<br>
+if the code is in plain view in the same file as the client code.
+<p>
+Often classes are implemented in separate program files<br>
+(which especially facilitates reusing classes for new projects)
+<p>
+The program files are then compiled independently and linked together.<br>
+Separate compilation has been around a lot longer than classes have been.
+<p>
+Of course, these separate program files must still agree on their<br>
+interfaces -- class definitions, methods, etc.
+<p>
+That information is stored in a common <i>header</i> file to be shared.<br>
+User-defined header files traditionally have an extension ".h"
+<p>
+Ideally, maximal information hiding would mean only the public<br>
+parts of a class would be stored in the header file<br>
+-- the interface to the constructor, accessor methods, public methods<br>
+-- NOT the implementation of any method, or the private instance variables.
+<p>
+Practically, C++ does not reach this ideal extreme
+<pre>
+
+
+
+
+
+
+</pre>
+<h3>A couple steps Back from Pure Information Hiding</h3>
+I) A class definition needs to have the private instance variables<br>
+in order to know how much memory to allocate for an instance.
+<p> 
+e.g. the two implementations for TimeOfDay needed different allocations
+<p>
+II) Methods defined within a class declaration are <i>inline</i>;<br>
+methods defined outside of a class declaration are not.
+<p>
+Typical constructors and accessors are very brief,<br>
+and do not merit the machinery of function call/return.
+<p>
+Minimizing the implementation details in the header file<br>
+maximizes flexibility in refining/improving the implementation.
+<pre>
+
+
+
+
+
+</pre>
+<h3>A little word about <tt>const</tt></h3>
+This is a good keyword to use whenever applicable!<br>
+It gives information to whoever may read the program<br>
+and also allows a compiler to do some optimizations.
+<pre>
+global constants 		-- should already be familiar<br>
+
+constant reference parameters	-- already used for array parameters
+				-- good for passing class 'values'
+
+constant member functions (the word appears After the parameter list)
+				-- does not modify the containing object
+
+e.g.  double Complex::magnitude() const;
+
+
+
+
+
+</pre>
+<h3>Regarding global variables</h3>
+Global variables are strongly discouraged because they open up
+many loopholes for program bugs.
+<p>
+Class member variables are intended to allow the possibility of
+sharing data among the methods for that class.
+<p>
+Do not allow these to behave like global variables!
+<p>
+In particular, avoid:
+<ul>
+<li>
+Global objects with public data members
+<br>
+e.g. do not permit every function to assign <tt>clock.minute = 70;</tt>
+<p>
+<li>
+Global objects with liberal modifier methods
+<br>
+e.g. <tt>setMinute(int arg) { minute = arg; }</tt> allows <tt>setMinute(70))</tt>
+</ul>
+<p>
+More simply, and for maximal safety:<br>
+no global variables; no public data members; minimal modifier methods
+<p>
+For large projects, one can allow for global objects with private data.
+<br>
+I would consider that if the object in question was:
+<ul>
+<li>
+truly used by much of the program (usage appears in many functions)
+<li>
+unique (those functions do not intend to manipulate other objects of same type)
+<li>
+independent (its internal consistency is unrelated to other program behavior)
+</ul>
+<tt>cin</tt> and <tt>cout</tt> qualify.<br>
+

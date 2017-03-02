@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1423524643 source:/Users/Fink/Documents/Code/recitation3/main.cpp
+	<iostream>
+	"linked.h"
+
+1423524756 /Users/Fink/Documents/Code/recitation3/linked.h
+

@@ -1,0 +1,132 @@
+<h3>Intro to Iterators</h3>
+<p>
+Now that we know how to implement a list structure,<br>it would be good to make sure it is usable.
+<p>
+Here is a checklist from an earlier lecture:
+<p>
+A client should be able to:<br>
+--- create a new (empty or initialized) linked list<br>
+--- add values to a linked list<br>
+--- remove values from a linked list<br>
+--- examine a value stored in a linked list (such as the first)<br>
+--- perhaps know how many values are in the linked list<br>
+--- perhaps see all of the contents of the list, in order
+<p>
+Recall that all member variables (including pointers) are private.
+<p>
+Consider these possible combinations of the above operations:<br>
+--- display all values that meet some condition (e.g. scores>90)<br>
+--- remove all values that meet some condition<br>
+--- edit or update a value (e.g. add 10 to a score)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(recall that the Node is immutable)
+<p>
+How might these problems be solved?<br>
+How long would those solutions take -- O(<em>?</em>) 
+<p>
+All three can actually  be solved in a similar way in O(<em>n</em>) time.
+<pre>
+
+
+
+
+
+
+
+</pre>
+<h3>The Iterator itself</h3>
+It would be nice to have a mechanism that would enable traversing
+a list, and allowing us to handle each list element in turn as desired.
+<p>
+An iterator is an object that allows a client to do that.
+<p>
+Close analogy: an subscript variable allows access to array elements in sequence.
+<p>
+Of course, the iterator would then have to know about next pointers, so would be declared to be a friend of the List class.
+<p>
+The client would also need to know how to begin and end a loop with an iterator.
+These would be defined by the List itself.
+<p>
+First, to see how this would look to the client:
+<pre>
+
+   for (iterator = list.begin(); iterator != list.end(); iterator.advance() )
+	// do something with iterator.value()
+
+</pre>
+For this classroom example, I will use the <tt>AugList</tt> from last class.
+<pre>
+
+
+
+
+</pre>
+<h3>An Iterator for AugList</h3>
+<pre>
+
+class Iterator
+{
+    friend class AugList;	// the AugList knows what this is
+    private:
+	AugList	  *list;	// the list to traverse
+	Node	  *current;	// current location in the list
+	Iterator( AugList *l, Node *c ) : list(l), current(c) { }
+    public:
+	int& value() const	// reference to current value
+	{
+	    return current->value;
+	}
+	void advance()		// move on to the next
+	{
+	    current = current->next;
+	}
+};
+
+// NOTE: private constructor, only created by AugList
+
+// and inside Auglist are these new public methods
+
+	iterator begin()	{ return iterator( this, next ); }
+	iterator end()  	{ return iterator( this, stub ); }
+
+// (Why does this last line use 'stub' instead of 'prev'?
+
+	// insert new element and refer to it
+	iterator insert( iterator pos, int v )
+	{
+	    insertBefore( pos.curr, v );
+	    return iterator( this, pos.curr->prev );
+	}
+
+// Why does insert place the new value before the current instead of after?
+// (Hint: consider the single-linked list case)
+
+	// erase a particular element and refer to its successor
+	iterator erase( iterator pos )
+	{	
+	    Node *next = pos.curr->next;
+	    remove( pos.curr );
+	    return iterator( this, next );
+	}
+
+
+</pre>
+<h3>Categories of Iterators</h3>
+How much utility an iterator provides depends on the needs
+of an application and the nature of the underlying data structure.
+<p>
+Forward -- traverses data in one direction only (begin to end)
+<br>
+Bi-Directional -- traverses in either direction (not for single-linked lists)
+<br>
+Random -- can also access in any order (not for linked lists)
+<p>
+Constant -- allows traversal of the data, but not modification
+<p>
+Input -- Forward and Constant
+<br>
+Output -- Forward and assumed Write-Only
+<p>
+For this course, the iterators for the homework assignments forward
+iterators intended primarily as input iterators.
+<p>
+The upcoming tutorial has a forward iterator that allows changes to the list.

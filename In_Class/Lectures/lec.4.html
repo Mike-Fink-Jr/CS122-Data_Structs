@@ -1,0 +1,258 @@
+<font size=+1>
+<h3>Pointers</h3>
+A <i>pointer</i> is a variable that contains the address<br>
+of some other variable.
+<p>
+One special value <tt><b>NULL</b></tt> points at nothing,
+and is often implemented as having a zero value.
+<p>
+A pointer variable itself may be changed (holding a different address)<br>
+so that it will point at a different variable.
+<p> 
+Also, a pointer variable may be <i>dereferenced</i>,<br>
+yielding a reference to the variable at which it points.
+<p>
+<pre>
+// NOTE: This example is illustrative only, and not constructive!
+
+int  j, k;		// two ordinary integers
+int *intP;		// pointer to an integer
+  
+intP = &j;		// & is the address-of operator
+*intP = 5;		// now j is 5
+intP = &k;		// now intP points at k instead
+*intP = 7;		// now k is 7
+</pre>
+<p>
+Pointers may introduce aliasing!
+<br>
+
+<pre>
+
+
+
+
+
+
+
+</pre>
+<h3>Dynamic Memory Allocation</h3>
+Pointers are more commonly used to access newly allocated variables.
+<p>
+<pre>
+int  *intArray;			// pointer to integers
+intArray = new int[20];		// allocate space for another 20 integers
+class Employee *empP;		// pointer to an Employee class
+empP = new Employee;		// allocate a new Employee instance
+</pre>
+<p>
+Allocating an array <i>dynamically</i> (i.e. at run-time) is useful<br>
+since the array size no longer has to be a constant at compile time.
+<p>
+Also Note: intArray and empP above are NOT aliases --<br>
+the newly allocated item only has one name to access it.
+<p>
+The memory may (or must) be deallocated later:
+<pre>
+	delete[] intArray; 
+	delete   empP;
+</pre>
+<br>
+
+<pre>
+
+
+
+
+
+
+
+</pre>
+<h2>Pointers as Fast Array Access</h2>
+The two following loops are functionally equivalent:
+<table width=90%>
+<tr><td valign=top>
+<pre>
+int  intArray[10];
+for (int i = 0; i < 10; i++)
+    cin >> intArray[i];
+<td valign=top>
+<pre>
+int  intArray[10];
+for (int *p = intArray; p < intArray+10; p++)
+    cin >> *p;
+</pre>
+</table>
+Since the pointer version does not have to recompute the addresses<br>
+of array elements, it ends up being slightly faster.<p>
+The difference in speed is more noticeable for simpler operations<br>
+(such as clearing arrays, or adding up their values)
+<p>
+BUT: A compiler may be smart enough to convert this itself!
+<pre>
+
+
+
+
+
+
+</pre>
+<h3>Dereferenced Pointers are References</h3>
+Therefore, a reference parameter can be approximated with a pointer:
+<table width=90%>
+<tr><td valign=top>
+<pre>
+void swap( int &a, int &b )
+{
+   int temp = a;
+   a = b;
+   b = temp;
+}
+<td valign=top>
+<pre>
+void swap( int *a, int *b )
+{
+   int temp = *a;
+   *a = *b;
+   *b = temp;
+}
+</table>
+Note that to get the reference, the pointers must be dereferenced.
+<pre>
+
+
+
+
+
+
+
+</pre>
+<h3>A catalog of common programming errors with pointers</h3>
+Forgetting to dereference a pointer before use<pre>
+   *intP = 5;	vs.	intP = 5;	// points at nonsense memory
+</pre>
+Forgetting to use the address-of operator to initialize a pointer<pre>
+   intP = &x;	vs.	intP = x;	// points at nonsense memory
+</pre>
+Dereferencing a pointer that has not yet been initialized<pre>
+   int *intP;	*intP = 5;		// 5 is stored where?
+</pre>
+Accidental aliasing after assigning pointers<br>
+(especially since pointers can point at <i>anything!</i>)
+<p>
+Reassigning a pointer that points to a dynamic allocation,<br>
+so that there is no way to deallocate that memory (memory leak)
+<p>
+Dereferencing a pointer that points at memory that's been deallocated:
+<pre>
+   int *p, *q = new int(5);		// q points at a 5
+   p = q;				// p points at the 5
+   delete q;				// memory deallocated
+   *p = 10;				// but p still points at it!
+					// (and q probably does also)
+</pre>
+(If the memory is reallocated, then p would be an alias to it!)
+<br>
+
+<pre>
+
+
+
+
+
+
+
+
+
+
+</pre>
+<h3>Character Arrays vs. C++ Strings</h3>
+<p>
+These both have very similar meaning with regard to an application --
+several character lined up in a row, representing a single value.
+<p>
+Character arrays are just like any other array; allocated when
+a declaring function begins, and deallocated when that function ends.
+Array size and location is expected to be fixed from the start and unchanged.
+<p>
+C++ strings manage their own memory.  They may be reallocated and copied
+to prevent changes from exceeding their bounds, paying a price in time
+for safety.  And of course, they are deallocated when containing function ends.
+<p>
+Dynamically allocated class variables may include character data.
+The member variables may be C++ strings, or arrays, or pointers!
+Pointers take less space within the object, because they point
+at character data outside the object.
+<p>
+Be wary of pointers inside objects!  They may be equal to
+pointers inside other objects (aliasing).  If the pointer value
+was originally a local variable somewhere, then these pointers
+may point at deallocated memory.
+<pre>
+
+
+
+
+
+</pre>
+<h3>Pointers and Destructors and Value Parameters</h3>
+Just as a constructor is called whenever a new class object is created,
+a destructor is called whenever it is deallocated.
+<p>
+Usually destructors are have nothing interesting to do, so none is written.
+(The default destructor does nothing.)
+<p>
+But if an object contains the only pointer to dynamically allocated memory,
+that memory may remain allocated after the object goes away (memory leak).
+<p>
+A good program should deallocate all unneeded memory while it can
+(unless it has a good expectation that the program will end 'soon')
+<p>
+Deallocating a 'large' data structure could either be done entirely
+within that class's destructor, or it might be delegated to destructor
+methods defined for each component allocation.
+<p>
+C++ has a surprise for those conscientious programmers who write destructors:
+<br>
+value parameters are copies of actual parameters, deallocated at function exit
+<p>
+How to avoid:<br>
+(1) pass these objects by reference, or <br>
+(2) pass pointers to these objects 
+<br>&nbsp;&nbsp;&nbsp;&nbsp;
+(not recommended unless you need that actual pointer)
+<pre>
+
+
+
+
+
+</pre>
+<p>
+<h3>Summary about Pointers</h3>
+Their primary use is for dynamic memory allocation --
+<br>
+-- allocating arrays at run-time based on the needs of a program
+<br>
+-- heavily used in linked lists, binary trees, etc. (coming soon)
+<p>
+Secondarily used for easy access to arrays (pointer arithmetic)<br>
+but compiler advances reduce the need for that.
+<p>
+Thirdly, can approximate reference parameters, but in C++
+we should use reference parameters whenever possible.
+<p>
+Besides the above, there is very little advantage to pointers.
+<br>
+but plenty of disadvantages -- the principal one being aliasing.
+<p>
+In other words, don't use them without a good reason!
+<pre>
+
+
+
+
+
+
+
+</pre>

@@ -1,0 +1,99 @@
+<html>
+<STYLE type="text/css">
+OL.withalpha { list-style-type: lower-alpha }
+</STYLE>
+<center>
+<h3>CMPSC 122<br>
+Fall 2014</h3>
+
+<h3>Homework IV<br>
+17 October 2014</h3>
+</center>
+
+This assignment introduces the use of a tree structure
+as a container, for rapid random access, associating
+string names with other data.
+<p>
+<h4>PROBLEM DESCRIPTION</h4>
+<p>
+Very few arithmetic expressions in a program consist of constant
+numbers as their only operands.  Most of them instead include
+variables that have been assigned in earlier statements.
+This assignment will therefore extend the earlier assignments
+by introducing variables as operands, and the assignment
+operator to assign to them.
+<p>
+The major part of this assignment may either build from 
+Homework II or Homework III, at the student's choice.
+However, it is recommended that it still make use of the
+List Iterator class defined in Homework III.
+<p>
+<h4>THE ASSIGNMENT OPERATOR</h4>
+<p>
+Most people certainly recognize the assignment operator as one
+that performs an assignment operation (giving a value to a variable).
+But in the languages of C, Java, C++, etc. it also 'computes'
+a value, which can be used in a larger expression.
+<p>
+For example, this expression:
+<pre>
+	A = 3 + (B = 2)
+</pre>
+Not only assigns 2 to B, but it adds that 2 to 3 to get a value of 5 for A.
+<p>
+Your program must accept this as a valid input.  And of course,
+not all valid inputs will necessarily assign to variables, and
+(from Homework II), some may even build on results of earlier statements.
+For example, this would be a valid input line after the previous example:
+<pre>
+	* B
+</pre>
+yielding a value of 10.
+<p>
+<h4>COMPONENT FILES</h4>
+<p>
+<table border>
+<tr><td colspan=2>New to this assignment:
+<tr><td><tt>vartree.h</tt><td>Defines classes for a new abstract data type
+<br>DO NOT CHANGE, unless pursuing Extra Credit
+<tr><td><tt>vartree.cpp</tt><td>Implements the class, with help from recursion.
+<br>Complete and submit
+<tr><td colspan=2>Replacements for this assignment:
+<tr><td><tt>evaluate.h</tt><td>
+Adds a new parameter to the <tt>evaluate</tt> function.
+<br>DO NOT CHANGE
+<tr><td><tt>driver.cpp</tt><td>Rewritten to use new <tt>evaluate</tt> interface.
+<tr><td colspan=2>To modify and adapt from earlier assignments:
+<tr><td><tt>token.h</tt><td>Variable names may be more than one letter, 
+so will require strings.<br>It would be best to no longer store a single char,
+<br>but you could still keep an accessor method that returns one.
+<tr><td><tt>token.cpp</tt><td>May need to be extended to support variable names.
+<tr><td><tt>tokenlist.h</tt><td>No change should be required
+<tr><td><tt>tokenlist.cpp</tt><td>Must be able to scan for variable names and assignment operator.
+<tr><td><tt>evaluate.cpp</tt><td>
+Will now recognize variable names and the assignment operator.
+<br>Complete and submit
+</table>
+Once again, the grader will not be using the same <tt>driver.cpp</tt> file,
+so you are free to edit that as much as desired to test your code.
+<p>
+Most of the files above will be included with your submission,
+with the exception of <tt>evaluate.h</tt> and <tt>driver.cpp</tt>.
+Any input that was valid for Homework II will still be valid now.
+<p>
+A <tt>makefile</tt> is also provided so that the make utility
+can be used to compile this program.  The first tutorial class 
+will have presented the make utility, and how it relates to
+Visual Studio projects.
+<p>
+<h4>EXTRA CREDIT OPTION</h4>
+<p>
+Write code so that one display all existing variables
+(and their values) using
+just one usage of the <tt>&lt;&lt;</tt> operator.   
+For example, it should be legal and meaningful for the last
+statement in the <tt>main</tt> function in <tt>driver.cpp</tt>
+to be <tt>cout << vars << endl;</tt>
+<p>
+Of course, the score for this option will depend on clarity
+and simplicity of implementation.
